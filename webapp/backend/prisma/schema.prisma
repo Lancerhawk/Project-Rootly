@@ -1,0 +1,64 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id             String    @id @default(uuid())
+  githubUserId   Int       @unique @map("github_user_id")
+  githubUsername String    @map("github_username")
+  githubEmail    String?   @map("github_email")
+  avatarUrl      String?   @map("avatar_url")
+  createdAt      DateTime  @default(now()) @map("created_at")
+  
+  projects       Project[]
+  
+  @@map("users")
+}
+
+model Project {
+  id           String    @id @default(uuid())
+  projectId    String    @unique @map("project_id")
+  ownerUserId  String    @map("owner_user_id")
+  repoFullName String    @unique @map("repo_full_name")
+  platform     String    @default("vercel")
+  createdAt    DateTime  @default(now()) @map("created_at")
+  
+  owner        User      @relation(fields: [ownerUserId], references: [id], onDelete: Cascade)
+  apiKey       ApiKey?
+  incidents    Incident[]
+  
+  @@map("projects")
+}
+
+model ApiKey {
+  id        String    @id @default(uuid())
+  projectId String    @unique @map("project_id")
+  keyHash   String    @map("key_hash")
+  createdAt DateTime  @default(now()) @map("created_at")
+  revokedAt DateTime? @map("revoked_at")
+  
+  project   Project   @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  
+  @@map("api_keys")
+}
+
+model Incident {
+  id           String   @id @default(uuid())
+  incidentId   String   @unique @map("incident_id")
+  projectId    String   @map("project_id")
+  repoFullName String   @map("repo_full_name")
+  status       String   @default("open")
+  summary      String
+  filePath     String?  @map("file_path")
+  lineNumber   Int?     @map("line_number")
+  createdAt    DateTime @default(now()) @map("created_at")
+  
+  project      Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  
+  @@map("incidents")
+}
