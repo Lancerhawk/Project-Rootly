@@ -19,7 +19,9 @@ router.get('/me', (req, res) => {
         });
     }
 
-    res.json(req.user);
+    // Strip sensitive token before sending to client
+    const { githubAccessToken, ...userWithoutToken } = req.user as any;
+    res.json(userWithoutToken);
 });
 
 /**
