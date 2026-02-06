@@ -32,6 +32,17 @@ app.use(cors({
     credentials: true,
 }));
 
+// Debug Middleware: Log Request Protocol & Headers
+app.use((req, res, next) => {
+    console.log(`[${new Date().toISOString()}] ${req.method} ${req.url}`);
+    console.log('Secure:', req.secure);
+    console.log('Protocol:', req.protocol);
+    console.log('X-Forwarded-Proto:', req.headers['x-forwarded-proto']);
+    console.log('Session ID:', req.sessionID);
+    console.log('User:', req.user ? 'Authenticated' : 'Not Authenticated');
+    next();
+});
+
 // Session configuration
 app.use(session({
     store: new PgSession({

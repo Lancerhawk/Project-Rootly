@@ -18,8 +18,15 @@ router.get('/github', passport.authenticate('github', {
 router.get('/github/callback',
     passport.authenticate('github', { failureRedirect: process.env.FRONTEND_URL }),
     (req, res) => {
-        // Successful authentication, redirect to dashboard
-        res.redirect(`${process.env.FRONTEND_URL}/dashboard`);
+        // Explicitly save session before redirecting to handle race conditions
+        req.session.save((err) => {
+            if (err) {
+                console.error('Session save error:', err);
+                return res.redirect(`${process.env.FRONTEND_URL}?error=session_save_failed`);
+            }
+            // Successful authentication, redirect to dashboard
+            res.redirect(`${process.env.FRONTEND_URL}/dashboard`);
+        });
     }
 );
 
