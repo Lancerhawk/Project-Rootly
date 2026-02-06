@@ -9,6 +9,7 @@ import ConnectPgSimple from 'connect-pg-simple';
 
 // Import routes
 import authRoutes from './routes/auth';
+import oauthRoutes from './routes/oauth';
 import githubRoutes from './routes/github';
 import projectRoutes from './routes/projects';
 import ingestRoutes from './routes/ingest';
@@ -44,9 +45,14 @@ app.use(session({
         maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
         httpOnly: true,
         secure: process.env.NODE_ENV === 'production',
-        sameSite: 'lax',
+        sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax', // Must be 'none' for cross-site auth (Vercel -> EC2)
     },
 }));
+
+// Trust proxy is required for secure cookies to work behind a proxy (like Nginx/EC2 load balancers)
+if (process.env.NODE_ENV === 'production') {
+    app.set('trust proxy', 1);
+}
 
 // Passport configuration
 app.use(passport.initialize());
@@ -118,8 +124,8 @@ passport.deserializeUser(async (sessionData: any, done) => {
 });
 
 // Routes
-app.use('/auth', authRoutes);
-app.use('/api', authRoutes); // /api/me endpoint
+app.use('/auth', oauthRoutes); // /auth/github
+app.use('/api', authRoutes);   // /api/me, /api/logout
 app.use('/api/github', githubRoutes);
 app.use('/api/projects', projectRoutes);
 app.use('/api/incidents', incidentsRoutes); // JWT authenticated
