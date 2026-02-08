@@ -27,7 +27,7 @@ export default function NewProjectPage() {
     const router = useRouter();
     const [repos, setRepos] = useState<Repo[]>([]);
     const [selectedRepo, setSelectedRepo] = useState('');
-    const [platform] = useState('vercel');
+    const [platform, setPlatform] = useState('vercel');
     const [loading, setLoading] = useState(true);
     const [creating, setCreating] = useState(false);
     const [error, setError] = useState('');
@@ -319,17 +319,28 @@ export default function NewProjectPage() {
                             <label className="block text-sm font-medium text-zinc-300 mb-4">
                                 Deployment Platform
                             </label>
-                            <div className="flex items-center justify-between px-4 py-3 bg-black/30 rounded-lg">
-                                <div className="flex items-center gap-3">
-                                    <div className="w-10 h-10 bg-zinc-800 rounded-lg flex items-center justify-center">
-                                        <svg className="w-6 h-6" viewBox="0 0 24 24" fill="currentColor">
-                                            <path d="M12 2L2 19.7778H22L12 2Z" />
-                                        </svg>
-                                    </div>
-                                    <span className="font-medium">Vercel</span>
+                            <div className="relative">
+                                <select
+                                    value={platform}
+                                    onChange={(e) => setPlatform(e.target.value)}
+                                    className="w-full px-4 py-3 pr-10 bg-black/50 border border-zinc-800 rounded-lg text-white focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all appearance-none cursor-pointer"
+                                    required
+                                >
+                                    <option value="vercel" className="bg-zinc-900">Vercel</option>
+                                    <option value="railway" className="bg-zinc-900">Railway</option>
+                                    <option value="render" className="bg-zinc-900">Render</option>
+                                    <option value="github-actions" className="bg-zinc-900">GitHub Actions</option>
+                                    <option value="custom" className="bg-zinc-900">Custom / Other</option>
+                                </select>
+                                <div className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none">
+                                    <svg className="w-5 h-5 text-zinc-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                                    </svg>
                                 </div>
-                                <span className="text-sm text-zinc-500">Only platform supported in MVP</span>
                             </div>
+                            <p className="mt-3 text-sm text-zinc-500">
+                                Select your deployment platform. The SDK automatically detects commit SHA from platform environment variables.
+                            </p>
                         </div>
 
                         {/* Error Message */}
