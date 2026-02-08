@@ -1,58 +1,124 @@
-# Rootly – Production Errors
+# Rootly - Production Error Tracking for VS Code
 
-View production errors from your deployed applications directly in VS Code.
+Debug production errors directly in your IDE. Rootly surfaces runtime failures exactly where they happened in your code—no more context switching between dashboards and editors.
 
 ## Features
 
-- **Real-time incident monitoring** - See production errors as they happen
-- **GitHub OAuth authentication** - Secure login with your GitHub account
-- **Automatic repository detection** - Detects your current repo from `.git/config`
-- **Clean, minimal UI** - Professional dark-themed sidebar
+### 🔍 Real-Time Error Tracking
+- Production incidents appear directly in your VS Code sidebar
+- Automatic polling every 45 seconds for new errors
+- Desktop notifications when new incidents are detected
 
-## Requirements
+### 🎯 Jump to Error Location
+- One-click navigation to the exact file and line where errors occurred
+- Automatic stack trace parsing for TypeScript, JavaScript, Python, Java, Go, Ruby, and PHP
+- Opens files directly in your workspace
 
-- A GitHub account
-- A project registered on Rootly (https://rootly.app)
-- VS Code 1.85.0 or higher
+### 📊 Expandable Incident Cards
+- Click any incident to see detailed information
+- Environment badges (Production, Staging, Development)
+- Timestamps with "time ago" formatting
+- Commit SHA for easy Git correlation
+
+### 🔄 Manual Refresh
+- Rate-limited refresh button (5 refreshes per 2 minutes)
+- Toolbar buttons for quick actions
+- Clean, professional UI
+
+### 🔐 Secure Authentication
+- GitHub OAuth integration
+- Session-based authentication
+- Repository verification
+
+## Installation
+
+1. Install the extension from VS Code Marketplace (coming soon) or from `.vsix` file
+2. Click "Login with GitHub" in the Rootly sidebar
+3. Authenticate and copy the session token
+4. Paste the token back into VS Code
+5. Connect your GitHub repository
+6. Start seeing production errors in your IDE!
 
 ## Usage
 
-1. **Login**: Run command `Rootly: Login` from the command palette
-2. **View incidents**: Click the Rootly icon in the activity bar
-3. **Click an incident** to view full details including stack trace
+### Viewing Incidents
+1. Open the Rootly sidebar (Activity Bar icon)
+2. See all open incidents for your connected repository
+3. Click any incident to expand and see details
 
-## Development
+### Navigating to Errors
+- **From Sidebar**: Expand incident → Click "Go to Error Location"
+- **From Details Panel**: Click "View Full Details" → Click "Jump to Error"
 
-### Install dependencies
-```bash
-npm install
-```
+### Manual Refresh
+- Click the refresh icon (🔄) in the sidebar toolbar
+- Limited to 5 refreshes per 2-minute window to prevent API abuse
 
-### Compile
-```bash
-npm run compile
-```
+### Managing Connection
+- **Disconnect**: Click disconnect icon (🔌) to unlink repository
+- **Logout**: Click logout icon (👤) to clear session
 
-### Run in development
-1. Open this folder in VS Code
-2. Press F5 to launch Extension Development Host
-3. Test the extension in the new window
+## Requirements
 
-### Package
-```bash
-npm run package
-```
+- VS Code 1.85.0 or higher
+- Active Rootly account with connected repository
+- GitHub repository access
 
-## Configuration
+## Extension Settings
 
-The extension connects to `http://localhost:3001` by default for local development.
+This extension contributes the following commands:
 
-## Privacy
+- `rootly.login`: Authenticate with GitHub
+- `rootly.logout`: Clear session and logout
+- `rootly.connectRepo`: Connect a GitHub repository
+- `rootly.disconnectRepo`: Disconnect current repository
+- `rootly.refresh`: Manually refresh incidents
+- `rootly.goToError`: Navigate to error location
+- `rootly.showIncidentDetails`: Open incident details panel
 
-- Authentication tokens are stored securely using VS Code's SecretStorage
-- No data is sent to third parties
-- Only reads `.git/config` to detect repository
+## Known Issues
+
+- Stack trace parsing currently supports common file patterns only
+- Files must exist in your local workspace to navigate to errors
+- Polling interval is fixed at 45 seconds (not configurable yet)
+
+## Release Notes
+
+### 1.1.0 (Latest)
+
+**Major UI/UX Improvements**
+- ✨ Added "Go to Error Location" button with automatic stack trace parsing
+- 🎨 Redesigned sidebar with expandable incident cards
+- 📱 New incident notifications with "View Incidents" action
+- 🎯 Professional incident details panel with highlighted actions
+- 🔄 Rate-limited manual refresh (5 per 2 minutes)
+- 🎨 Clean, professional icons throughout (removed emoji-based icons)
+
+**Backend Improvements**
+- 🔐 Fixed IDE OAuth flow with minimal, professional auth page
+- 🍪 Improved session cookie handling and signing
+- 🐛 Fixed "headers already sent" error in OAuth callback
+
+**Technical**
+- Stack trace regex supports: TS, JS, Python, Java, Go, Ruby, PHP
+- VS Code theme-aware styling
+- Workspace file search with node_modules exclusion
+
+### 0.1.0
+
+- Initial release
+- Basic incident viewing
+- GitHub OAuth authentication
+- Repository connection
+
+## Contributing
+
+This extension is part of the Rootly project. For issues and feature requests, please visit our [GitHub repository](https://github.com/yourusername/rootly).
 
 ## License
 
-MIT
+[Your License Here]
+
+---
+
+**Enjoy debugging with Rootly!** 🚀

@@ -2,9 +2,9 @@
     "name": "rootly",
     "displayName": "Rootly – Production Errors",
     "description": "View production errors from your deployed applications directly in VS Code",
-    "version": "0.1.0",
+    "version": "1.1.0",
     "publisher": "rootly",
-    "icon": "resources/icon.svg",
+    "icon": "resources/icon.png",
     "engines": {
         "vscode": "^1.85.0"
     },

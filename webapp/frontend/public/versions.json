@@ -1,11 +1,67 @@
 {
-    "currentVersion": "1.0.3",
+    "currentVersion": "1.1.0",
     "versions": [
+        {
+            "version": "1.1.0",
+            "name": "IDE Extension Release",
+            "releaseDate": "2026-02-08",
+            "status": "current",
+            "description": "Professional VS Code extension with Go to Error functionality, expandable incident cards, and real-time notifications",
+            "features": [
+                {
+                    "title": "Go to Error Location",
+                    "description": "One-click navigation to exact file and line where errors occurred with automatic stack trace parsing",
+                    "status": "completed"
+                },
+                {
+                    "title": "Expandable Incident Cards",
+                    "description": "Click incidents to see environment, timestamps, and commit SHA in a clean interface",
+                    "status": "completed"
+                },
+                {
+                    "title": "New Incident Notifications",
+                    "description": "Desktop alerts when new incidents are detected with quick action buttons",
+                    "status": "completed"
+                },
+                {
+                    "title": "Manual Refresh",
+                    "description": "Rate-limited refresh button (5 per 2 minutes) with toolbar quick actions",
+                    "status": "completed"
+                },
+                {
+                    "title": "Professional UI Redesign",
+                    "description": "Clean, minimal interface with VS Code native icons throughout",
+                    "status": "completed"
+                },
+                {
+                    "title": "Enhanced OAuth Flow",
+                    "description": "Minimal, professional IDE authentication page matching webapp theme",
+                    "status": "completed"
+                }
+            ],
+            "technicalDetails": {
+                "extension": [
+                    "VS Code Extension API",
+                    "TypeScript",
+                    "Stack trace parsing (TS, JS, Python, Java, Go, Ruby, PHP)"
+                ],
+                "features": [
+                    "Workspace file search",
+                    "VS Code theme-aware styling",
+                    "Rate limiting (5 per 2 min)"
+                ],
+                "backend": [
+                    "Fixed OAuth 'headers already sent' error",
+                    "Improved session cookie handling",
+                    "Manual cookie signing"
+                ]
+            }
+        },
         {
             "version": "1.0.3",
             "name": "Production Hardening",
             "releaseDate": "2026-02-06",
-            "status": "current",
+            "status": "implemented",
             "description": "Critical deployment fixes for cross-domain authentication and session management",
             "features": [
                 {
@@ -190,42 +246,6 @@
                     "TypeScript",
                     "Source Maps",
                     "Error Serialization"
-                ]
-            }
-        },
-        {
-            "version": "0.3.0",
-            "name": "VS Code Extension",
-            "releaseDate": "TBD",
-            "status": "planned",
-            "description": "IDE integration for inline error notifications and debugging",
-            "features": [
-                {
-                    "title": "Inline Error Display",
-                    "description": "Production errors shown directly in code",
-                    "status": "planned"
-                },
-                {
-                    "title": "Error Navigation",
-                    "description": "Jump to error locations in codebase",
-                    "status": "planned"
-                },
-                {
-                    "title": "Real-time Notifications",
-                    "description": "Instant alerts for new production errors",
-                    "status": "planned"
-                },
-                {
-                    "title": "GitHub Integration",
-                    "description": "Sync with repository structure",
-                    "status": "planned"
-                }
-            ],
-            "technicalDetails": {
-                "extension": [
-                    "VS Code API",
-                    "TypeScript",
-                    "WebSockets"
                 ]
             }
         },

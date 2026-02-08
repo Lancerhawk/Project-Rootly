@@ -7,6 +7,82 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [1.1.0] - 2026-02-08
+
+### 🎉 IDE Extension Release
+
+This major release introduces the VS Code extension with professional UI, Go to Error functionality, and real-time incident notifications directly in your IDE.
+
+### Added
+
+#### VS Code Extension Features
+- **Go to Error Location**: One-click navigation to exact file and line where errors occurred
+  - Automatic stack trace parsing for TypeScript, JavaScript, Python, Java, Go, Ruby, and PHP
+  - Workspace file search with `node_modules` exclusion
+  - Opens files directly in VS Code at the error line
+- **Expandable Incident Cards**: Click incidents in sidebar to see detailed information
+  - Environment badges (Production, Staging, Development)
+  - Timestamps with "time ago" formatting
+  - Commit SHA display (first 7 characters)
+  - "View Full Details" button
+- **New Incident Notifications**: Desktop alerts when new incidents are detected
+  - "View Incidents" action button
+  - Only alerts for newly detected incidents (not on initial load)
+  - Incident tracking with Set data structure
+- **Manual Refresh**: Rate-limited refresh button in toolbar
+  - 5 refreshes per 2-minute window
+  - Prevents API abuse
+  - Clear user feedback on rate limits
+- **Professional UI Redesign**: Clean, minimal interface throughout
+  - VS Code native icons (removed emoji-based icons)
+  - Theme-aware styling using CSS variables
+  - Better visual hierarchy and spacing
+  - Professional incident details panel
+
+#### Backend Improvements
+- **Enhanced OAuth Flow**: Minimal, professional IDE authentication page
+  - Dark theme matching webapp aesthetic (#0a0a0a background)
+  - Clean token display with copy-to-clipboard
+  - Consistent branding across webapp and extension
+- **Fixed OAuth Bugs**: Resolved "headers already sent" error in IDE authentication
+- **Improved Session Handling**: Manual cookie signing with `cookie-signature` for IDE auth
+
+### Changed
+- Extension version updated from 0.1.0 to 1.1.0
+- Incident tree view now uses collapsible items instead of flat list
+- OAuth callback page redesigned for professional appearance
+- Sidebar UI completely redesigned with expandable cards
+
+### Technical Details
+
+#### Extension
+- **Stack Trace Regex**: `/(?:at\s+|\()([^\s()]+\.(ts|js|tsx|jsx|py|java|go|rb|php)):(\d+)(?::(\d+))?/`
+- **Commands Added**: `rootly.goToError` for navigation
+- **Incident Tracking**: `previousIncidentIds` Set for notification deduplication
+- **Rate Limiting**: 5 refreshes per 2-minute sliding window
+- **Icons**: ThemeIcon with proper colors (arrow-right, server-environment, clock, git-commit)
+
+#### Backend
+- **Files Modified**: `webapp/backend/src/routes/oauth.ts`
+- **Cookie Signing**: Manual signing using `cookie-signature` library
+- **Return Statement**: Added to prevent double response sending
+
+#### Documentation
+- **README.md**: Comprehensive guide with all features and usage
+- **CHANGELOG.md**: Detailed v1.1.0 changelog following Keep a Changelog format
+- **Extension Docs**: Installation, usage, and troubleshooting guides
+
+### Files Modified
+- `ide-extension/package.json` - Version updated to 1.1.0
+- `ide-extension/src/extension.ts` - Added incident tracking, notifications, goToError command
+- `ide-extension/src/views/incidentsTree.ts` - Redesigned with expandable cards and stack trace parsing
+- `ide-extension/README.md` - Comprehensive documentation
+- `ide-extension/CHANGELOG.md` - Detailed changelog
+- `webapp/backend/src/routes/oauth.ts` - Enhanced IDE auth page and bug fixes
+- `webapp/frontend/public/versions.json` - Added v1.1.0 entry
+- `webapp/frontend/package.json` - Version updated to 1.1.0
+- `webapp/backend/package.json` - Version updated to 1.1.0
+
 ---
 
 ## [1.0.3] - 2026-02-06
@@ -226,6 +302,7 @@ The first release of Rootly establishes the core web application infrastructure 
 
 ## Version History
 
+- **[1.1.0]** - 2026-02-08 - IDE Extension Release
 - **[1.0.3]** - 2026-02-06 - Production Hardening & Deployment Fixes
 - **[1.0.2]** - 2026-02-06 - Phase 2 (Production-Ready Error Ingestion)
 - **[1.0.1]** - 2026-02-06 - Initial release (Web App Foundation)

@@ -43,7 +43,16 @@ Rootly provides:
 
 ## ✨ Key Features
 
-### Current (v1.0.3 - Production Hardening)
+### Current (v1.1.0 - IDE Extension Release)
+
+- ✅ **Go to Error Location** - One-click navigation to exact file and line where errors occurred
+- ✅ **Expandable Incident Cards** - Click incidents to see environment, timestamps, and commit SHA
+- ✅ **New Incident Notifications** - Desktop alerts when new incidents are detected
+- ✅ **Manual Refresh** - Rate-limited refresh button (5 per 2 minutes)
+- ✅ **Professional UI Redesign** - Clean, minimal interface with VS Code native icons
+- ✅ **Enhanced OAuth Flow** - Minimal, professional IDE authentication page
+
+### Previously Implemented (v1.0.3)
 
 - ✅ **Cross-Site Cookie Support** - SameSite=None for cross-domain auth
 - ✅ **Session Race Condition Fix** - Explicit session saving before redirect
@@ -70,7 +79,6 @@ Rootly provides:
 ### Coming Soon
 
 - 🔄 **Node.js SDK** (v0.2.0) - Error tracking library for Node.js apps
-- 🔄 **VS Code Extension** (v0.3.0) - Inline error notifications in your editor
 - 🔄 **Error Dashboard** (v0.4.0) - Real-time monitoring and analytics
 - 🔄 **Team Collaboration** - Share and assign errors to team members
 - 🔄 **Source Maps** - Accurate stack traces for production code
@@ -447,12 +455,13 @@ The frontend will start on `http://localhost:3000`
 - [ ] Context collection
 - [ ] API integration
 
-### Phase 4: VS Code Extension 🔄 (v0.3.0)
-- [ ] Real-time error notifications
-- [ ] Inline error display
-- [ ] Jump to error location
-- [ ] GitHub repository sync
-- [ ] Error filtering
+### Phase 4: VS Code Extension ✅ (v1.1.0 - Completed)
+- [x] Real-time error notifications
+- [x] Expandable incident cards
+- [x] Jump to error location with stack trace parsing
+- [x] GitHub repository sync
+- [x] Professional UI with native icons
+- [x] Manual refresh with rate limiting
 
 ### Phase 5: Error Dashboard 🔄 (v0.4.0)
 - [ ] Error analytics and charts
@@ -500,7 +509,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 Built with modern web technologies and a passion for improving developer experience.
 
-**Current Version**: 1.0.2 - Production-Ready Error Ingestion
+**Current Version**: 1.1.0 - IDE Extension Release
 
 ---
 
