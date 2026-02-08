@@ -1,6 +1,7 @@
 import * as vscode from 'vscode';
 
-const BACKEND_URL = 'http://localhost:3001';
+// const BACKEND_URL = 'http://localhost:3001';
+const BACKEND_URL = 'https://3.111.33.111.nip.io';
 
 /**
  * Incident type matching backend API response

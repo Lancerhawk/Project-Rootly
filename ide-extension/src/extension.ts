@@ -236,7 +236,8 @@ async function handleConnectRepo() {
                 'Open Dashboard'
             ).then(selection => {
                 if (selection === 'Open Dashboard') {
-                    vscode.env.openExternal(vscode.Uri.parse('http://localhost:3000'));
+                    // vscode.env.openExternal(vscode.Uri.parse('http://localhost:3000'));
+                    vscode.env.openExternal(vscode.Uri.parse('https://project-rootly.vercel.app'));
                 }
             });
             return;

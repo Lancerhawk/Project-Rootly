@@ -1,7 +1,8 @@
 import * as vscode from 'vscode';
 
 const TOKEN_KEY = 'rootly.authToken';
-const BACKEND_URL = 'http://localhost:3001';
+// const BACKEND_URL = 'http://localhost:3001';
+const BACKEND_URL = 'https://3.111.33.111.nip.io';
 
 /**
  * Authenticate user via GitHub OAuth
