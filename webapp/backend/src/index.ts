@@ -28,10 +28,12 @@ const PgSession = ConnectPgSimple(session);
 // Middleware
 app.use(express.json());
 app.use(cors({
-    origin: [process.env.FRONTEND_URL || 'http://localhost:3000', 'https://3.111.33.111.nip.io'],
+    origin: [
+        process.env.FRONTEND_URL || 'http://localhost:3000',
+        process.env.BACKEND_URL || 'http://localhost:3001'
+    ],
     credentials: true,
 }));
-
 
 
 // Session configuration
