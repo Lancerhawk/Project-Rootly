@@ -49,45 +49,36 @@ function computeFingerprint(error: Error): string {
 
 function shouldDeduplicate(fingerprint: string): boolean {
     const now = Date.now();
-    const lastSent = errorFingerprints.get(fingerprint);
-
-    if (lastSent && (now - lastSent) < DEDUP_WINDOW_MS) {
-        debugLog(`Deduplicated: ${fingerprint.substring(0, 50)}...`);
+    const lastSeen = errorFingerprints.get(fingerprint);
+    if (lastSeen && now - lastSeen < DEDUP_WINDOW_MS) {
+        debugLog('Duplicate error suppressed');
         return true;
     }
-
     errorFingerprints.set(fingerprint, now);
-
-    // Hard memory cap: delete oldest 50% if exceeded
     if (errorFingerprints.size > MAX_FINGERPRINTS) {
-        const entries = Array.from(errorFingerprints.entries());
-        entries.sort((a, b) => a[1] - b[1]); // Sort by timestamp
-        const toDelete = Math.floor(MAX_FINGERPRINTS / 2);
-        for (let i = 0; i < toDelete; i++) {
-            errorFingerprints.delete(entries[i][0]);
-        }
-        debugLog(`Memory cap: deleted ${toDelete} old fingerprints`);
+        const oldestKey = errorFingerprints.keys().next().value;
+        if (oldestKey) errorFingerprints.delete(oldestKey);
     }
     return false;
 }
 
 function isRateLimited(): boolean {
     const now = Date.now();
-
-    let validIndex = 0;
-    while (validIndex < errorTimestamps.length && now - errorTimestamps[validIndex] > RATE_LIMIT_WINDOW_MS) {
-        validIndex++;
+    const cutoff = now - RATE_LIMIT_WINDOW_MS;
+    while (errorTimestamps.length > 0 && errorTimestamps[0] < cutoff) {
+        errorTimestamps.shift();
     }
-    if (validIndex > 0) errorTimestamps.splice(0, validIndex);
-
     if (errorTimestamps.length >= RATE_LIMIT_MAX) {
-        debugLog('Rate limited: 20/60s exceeded');
+        debugLog('Rate limit exceeded');
         return true;
     }
     errorTimestamps.push(now);
     return false;
 }
 
+/**
+ * Capture error asynchronously
+ */
 export function captureError(
     error: Error,
     apiKey: string,
@@ -95,18 +86,18 @@ export function captureError(
     apiUrl: string,
     extraContext?: any,
     severity?: 'error' | 'warning' | 'info'
-): void {
+): Promise<void> {
     try {
         // Recursive capture protection
         if ((error as any)[ROOTLY_CAPTURED]) {
             debugLog('Recursive capture prevented');
-            return;
+            return Promise.resolve();
         }
         (error as any)[ROOTLY_CAPTURED] = true;
 
         const fingerprint = computeFingerprint(error);
-        if (shouldDeduplicate(fingerprint)) return;
-        if (isRateLimited()) return;
+        if (shouldDeduplicate(fingerprint)) return Promise.resolve();
+        if (isRateLimited()) return Promise.resolve();
 
         const payload = {
             error: {
@@ -118,8 +109,8 @@ export function captureError(
             context: buildContext(environment, extraContext),
         };
         debugLog(`Sending: ${error.message} (${severity ?? 'error'})`);
-        sendPayload(payload, apiKey, apiUrl);
+        return sendPayload(payload, apiKey, apiUrl);
     } catch (err) {
-        // Fail silently
+        return Promise.resolve();
     }
 }

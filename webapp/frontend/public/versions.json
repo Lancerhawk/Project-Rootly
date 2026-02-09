@@ -1,6 +1,66 @@
 {
-    "currentVersion": "1.2.0",
+    "currentVersion": "1.2.2",
     "versions": [
+        {
+            "version": "1.2.2",
+            "name": "Serverless Support (Partial)",
+            "releaseDate": "2026-02-09",
+            "status": "current",
+            "description": "Async/await SDK with flush() method for serverless environments. ⚠️ Vercel serverless functions currently only support manual capture - automatic error capture coming soon",
+            "features": [
+                {
+                    "title": "flush() Method",
+                    "description": "Wait for all pending error reports to complete before function exits",
+                    "status": "completed"
+                },
+                {
+                    "title": "Promise-Based API",
+                    "description": "All capture methods now return Promises for async/await usage",
+                    "status": "completed"
+                },
+                {
+                    "title": "Railway Support",
+                    "description": "Full error capture support for Railway deployments (all error types)",
+                    "status": "completed"
+                },
+                {
+                    "title": "Render Support",
+                    "description": "Full error capture support for Render deployments (all error types)",
+                    "status": "completed"
+                },
+                {
+                    "title": "GitHub Actions Support",
+                    "description": "Full error capture support for CI/CD pipelines (all error types)",
+                    "status": "completed"
+                },
+                {
+                    "title": "Vercel Serverless (Partial)",
+                    "description": "⚠️ Currently only manual capture works - automatic uncaught exception handling coming soon",
+                    "status": "in-progress"
+                }
+            ],
+            "technicalDetails": {
+                "sdk": [
+                    "Promise-based transport",
+                    "Active request tracking with Set<Promise<void>>",
+                    "Automatic flush in global handlers (200ms timeout)",
+                    "Zero dependencies"
+                ],
+                "platformSupport": [
+                    "✅ Railway - Full support (all error types)",
+                    "✅ Render - Full support (all error types)",
+                    "✅ GitHub Actions - Full support (all error types)",
+                    "⚠️ Vercel Serverless - Partial (manual capture only)",
+                    "✅ Traditional Node.js - Full support"
+                ],
+                "limitations": [
+                    "Vercel serverless: Uncaught exceptions not captured (async handler limitation)",
+                    "Vercel serverless: Unhandled rejections not captured (async handler limitation)",
+                    "Vercel serverless: Manual capture() works perfectly",
+                    "Full Vercel support coming in v1.3.0"
+                ]
+            }
+        },
         {
             "version": "1.2.0",
             "name": "Runtime SDK Production Hardening",

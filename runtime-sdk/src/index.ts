@@ -3,7 +3,7 @@
  */
 
 import { captureError, setDebugMode } from './runtime';
-import { getPendingRequests } from './transport';
+import { flush } from './transport';
 
 interface InitOptions {
     apiKey: string;
@@ -36,26 +36,35 @@ export function init(options: InitOptions): void {
 
         if (options.debug) setDebugMode(true);
 
-        process.prependListener('uncaughtException', handleError);
-        process.prependListener('unhandledRejection', handleRejection);
-
-        process.on('beforeExit', () => {
-            if (getPendingRequests() > 0) setTimeout(() => { }, 200);
+        // Global error handlers with automatic flush
+        process.prependListener('uncaughtException', async (error) => {
+            await handleError(error);
         });
-        process.on('SIGTERM', () => {
-            if (getPendingRequests() > 0) setTimeout(() => { }, 200);
+
+        process.prependListener('unhandledRejection', async (reason) => {
+            await handleRejection(reason);
+        });
+
+        // Graceful shutdown handlers
+        process.on('beforeExit', async () => {
+            await flush(200);
+        });
+
+        process.on('SIGTERM', async () => {
+            await flush(200);
+            process.exit(0);
         });
     } catch (error) {
         // Fail silently
     }
 }
 
-export function capture(error: Error, extraContext?: any, severity?: 'error' | 'warning' | 'info'): void {
+export function capture(error: Error, extraContext?: any, severity?: 'error' | 'warning' | 'info'): Promise<void> {
     try {
-        if (!apiKey) return;
-        captureError(error, apiKey, environment, apiUrl, extraContext, severity);
+        if (!apiKey) return Promise.resolve();
+        return captureError(error, apiKey, environment, apiUrl, extraContext, severity);
     } catch (err) {
-        // Fail silently
+        return Promise.resolve();
     }
 }
 
@@ -80,7 +89,7 @@ export function wrap<T extends (...args: any[]) => any>(fn: T): T {
 }
 
 export function expressErrorHandler() {
-    return (err: any, req: any, res: any, next: any): void => {
+    return async (err: any, req: any, res: any, next: any) => {
         try {
             if (!apiKey) return next(err);
             if (res.statusCode >= 500) {
@@ -91,7 +100,8 @@ export function expressErrorHandler() {
                     path: req.path || req.url,
                     status_code: res.statusCode,
                 };
-                captureError(error, apiKey, environment, apiUrl, extraContext);
+                // Await the capture to ensure it completes before response is sent
+                await captureError(error, apiKey, environment, apiUrl, extraContext);
             }
             next(err);
         } catch (error) {
@@ -100,19 +110,41 @@ export function expressErrorHandler() {
     };
 }
 
-function handleError(error: Error): void {
+async function handleError(error: Error): Promise<void> {
     try {
-        captureError(error, apiKey, environment, apiUrl);
+        await captureError(error, apiKey, environment, apiUrl);
+        await flush(200); // Wait up to 200ms for request to complete
     } catch (err) {
         // Fail silently
     }
 }
 
-function handleRejection(reason: any): void {
+async function handleRejection(reason: any): Promise<void> {
     try {
         const error = reason instanceof Error ? reason : new Error(String(reason));
-        captureError(error, apiKey, environment, apiUrl);
+        await captureError(error, apiKey, environment, apiUrl);
+        await flush(200); // Wait up to 200ms for request to complete
     } catch (err) {
         // Fail silently
     }
 }
+
+/**
+ * Flush all pending error reports
+ * Call this before your serverless function exits to ensure all errors are sent
+ * 
+ * @param timeoutMs - Maximum time to wait for pending requests (default: 5000ms)
+ * @returns Promise that resolves when all requests complete or timeout
+ * 
+ * @example
+ * // In serverless function
+ * export async function handler(event) {
+ *   try {
+ *     // Your code
+ *   } catch (error) {
+ *     await capture(error);
+ *     await flush(); // Ensure error is sent before function exits
+ *   }
+ * }
+ */
+export { flush };

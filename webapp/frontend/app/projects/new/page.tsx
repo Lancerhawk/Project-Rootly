@@ -27,7 +27,7 @@ export default function NewProjectPage() {
     const router = useRouter();
     const [repos, setRepos] = useState<Repo[]>([]);
     const [selectedRepo, setSelectedRepo] = useState('');
-    const [platform, setPlatform] = useState('vercel');
+    const [platform, setPlatform] = useState('render');
     const [loading, setLoading] = useState(true);
     const [creating, setCreating] = useState(false);
     const [error, setError] = useState('');
@@ -326,10 +326,10 @@ export default function NewProjectPage() {
                                     className="w-full px-4 py-3 pr-10 bg-black/50 border border-zinc-800 rounded-lg text-white focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all appearance-none cursor-pointer"
                                     required
                                 >
-                                    <option value="vercel" className="bg-zinc-900">Vercel</option>
-                                    <option value="railway" className="bg-zinc-900">Railway</option>
                                     <option value="render" className="bg-zinc-900">Render</option>
+                                    <option value="railway" className="bg-zinc-900">Railway</option>
                                     <option value="github-actions" className="bg-zinc-900">GitHub Actions</option>
+                                    <option value="vercel" className="bg-zinc-900">Vercel</option>
                                     <option value="custom" className="bg-zinc-900">Custom / Other</option>
                                 </select>
                                 <div className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none">
@@ -338,9 +338,14 @@ export default function NewProjectPage() {
                                     </svg>
                                 </div>
                             </div>
-                            <p className="mt-3 text-sm text-zinc-500">
-                                Select your deployment platform. The SDK automatically detects commit SHA from platform environment variables.
-                            </p>
+                            <div className="mt-3 bg-amber-500/10 border border-amber-500/30 rounded-lg p-4">
+                                <p className="text-sm text-amber-300 font-medium mb-2">
+                                    ⚠️ <strong>Beta Testing Phase</strong>
+                                </p>
+                                <p className="text-sm text-zinc-400">
+                                    Rootly is currently in active development. Some errors may not be captured reliably across all platforms. We're continuously improving error detection and capture mechanisms.
+                                </p>
+                            </div>
                         </div>
 
                         {/* Error Message */}

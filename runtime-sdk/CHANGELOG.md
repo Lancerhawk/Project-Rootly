@@ -7,6 +7,76 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [1.2.3] - 2026-02-09
+
+### 🐛 Bug Fix Release
+
+Critical fix for Express error handler to properly capture 5xx errors.
+
+### Fixed
+
+- **Express Error Handler** - Now properly awaits async `captureError()` call
+  - Express 5xx errors were being logged but not sent to backend
+  - Made `expressErrorHandler()` async to await the Promise
+  - Ensures HTTP request completes before response is sent
+  - Fixes issue where errors appeared in logs but not in dashboard
+
+### Technical Details
+
+- Express middleware now uses `async (err, req, res, next) => {}`
+- Awaits `captureError()` before calling `next(err)`
+- Fully backward compatible with existing Express apps
+
+---
+
+## [1.2.2] - 2026-02-09
+
+### 🚀 Serverless Support Release
+
+This release adds **100% reliable serverless support** by converting the SDK to use async/await patterns and adding a `flush()` method.
+
+### Added
+
+#### Serverless Features
+- **`flush()` Method** - Wait for all pending error reports to complete
+  - Essential for serverless environments (Vercel, AWS Lambda, etc.)
+  - Automatically called in global error handlers with 200ms timeout
+  - Can be called manually before function exits
+  - Example: `await flush()` or `await flush(5000)` for custom timeout
+- **Promise-Based API** - All capture methods now return Promises
+  - `capture()` returns `Promise<void>`
+  - `sendPayload()` returns `Promise<void>`
+  - Enables proper async/await usage in serverless functions
+
+#### Reliability Improvements
+- **Active Request Tracking** - Tracks all in-flight HTTP requests
+  - Uses `Set<Promise<void>>` for accurate tracking
+  - `flush()` waits for all active requests to complete
+  - Race condition protection with timeout
+- **Automatic Flush** - Global handlers automatically flush before exit
+  - `uncaughtException` handler flushes with 200ms timeout
+  - `unhandledRejection` handler flushes with 200ms timeout
+  - `beforeExit` and `SIGTERM` handlers flush pending requests
+
+### Changed
+
+#### API Changes
+- **Async Global Handlers** - Error handlers now use async/await
+  - Ensures errors are sent before process crashes
+  - Works in both serverless and traditional environments
+- **Promise Returns** - `capture()` now returns `Promise<void>`
+  - Backward compatible (can ignore return value)
+  - Enables `await capture(error)` for guaranteed delivery
+
+### Technical Details
+
+- **Serverless Compatible**: Works in Vercel, AWS Lambda, Railway, Render, etc.
+- **No External Dependencies**: Still uses only native Node.js modules
+- **Backward Compatible**: Existing code works unchanged
+- **Industry Standard**: Follows same pattern as Sentry, DataDog, etc.
+
+---
+
 ## [1.2.0] - 2026-02-09
 
 ### 🎉 Production Hardening Release

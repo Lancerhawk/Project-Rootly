@@ -170,6 +170,17 @@ init({
                                         Intentionally not captured: 4xx errors, handled try/catch blocks, frontend errors
                                     </p>
                                 </div>
+                                <div className="mt-4 p-4 bg-amber-500/10 border border-amber-500/30 rounded-lg">
+                                    <p className="text-sm text-amber-300 font-semibold mb-2 flex items-center gap-2">
+                                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                                        </svg>
+                                        Beta Notice
+                                    </p>
+                                    <p className="text-sm text-zinc-400">
+                                        Rootly is in active development. While we strive for reliable error capture, some errors may not be captured consistently across all platforms and scenarios. We do not guarantee 100% error detection.
+                                    </p>
+                                </div>
                             </div>
 
                             <div>
@@ -234,6 +245,70 @@ ROOTLY_API_KEY=your_api_key_here`}
                                         </li>
                                     </ol>
                                 </div>
+                            </div>
+                        </div>
+                    </section>
+
+                    {/* Platform Support */}
+                    <section className="mb-16">
+                        <h2 className="text-3xl font-bold mb-6">Platform Support</h2>
+                        <div className="bg-zinc-900 border border-zinc-800 rounded-xl p-8">
+                            <h3 className="text-xl font-semibold text-white mb-4">Supported Platforms</h3>
+                            <div className="grid md:grid-cols-2 gap-4 mb-6">
+                                <div className="bg-black/50 border border-zinc-800 rounded-lg p-4">
+                                    <p className="font-semibold text-white mb-1">Render</p>
+                                    <p className="text-sm text-zinc-400">Node.js deployments</p>
+                                </div>
+                                <div className="bg-black/50 border border-zinc-800 rounded-lg p-4">
+                                    <p className="font-semibold text-white mb-1">Railway</p>
+                                    <p className="text-sm text-zinc-400">Node.js deployments</p>
+                                </div>
+                                <div className="bg-black/50 border border-zinc-800 rounded-lg p-4">
+                                    <p className="font-semibold text-white mb-1">GitHub Actions</p>
+                                    <p className="text-sm text-zinc-400">CI/CD pipelines</p>
+                                </div>
+                                <div className="bg-black/50 border border-zinc-800 rounded-lg p-4">
+                                    <p className="font-semibold text-white mb-1">Vercel</p>
+                                    <p className="text-sm text-zinc-400">Serverless functions</p>
+                                </div>
+                                <div className="bg-black/50 border border-zinc-800 rounded-lg p-4">
+                                    <p className="font-semibold text-white mb-1">Traditional Node.js</p>
+                                    <p className="text-sm text-zinc-400">Standard servers</p>
+                                </div>
+                                <div className="bg-black/50 border border-zinc-800 rounded-lg p-4">
+                                    <p className="font-semibold text-white mb-1">Custom</p>
+                                    <p className="text-sm text-zinc-400">Any Node.js environment</p>
+                                </div>
+                            </div>
+
+                            <div className="bg-amber-500/10 border border-amber-500/30 rounded-lg p-6">
+                                <h4 className="text-lg font-semibold text-amber-400 mb-3 flex items-center gap-2">
+                                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                                    </svg>
+                                    Beta Testing Phase
+                                </h4>
+                                <p className="text-sm text-zinc-300 mb-3">
+                                    Rootly is currently in active development and beta testing. Error capture reliability varies across platforms and error types.
+                                </p>
+                                <ul className="text-sm text-zinc-400 space-y-2">
+                                    <li className="flex items-start gap-2">
+                                        <span className="text-amber-400 mt-0.5">•</span>
+                                        <span>Some errors may not be captured consistently</span>
+                                    </li>
+                                    <li className="flex items-start gap-2">
+                                        <span className="text-amber-400 mt-0.5">•</span>
+                                        <span>Manual <code className="px-1.5 py-0.5 bg-black/50 border border-zinc-700 rounded text-indigo-400 text-xs">capture()</code> is most reliable across all platforms</span>
+                                    </li>
+                                    <li className="flex items-start gap-2">
+                                        <span className="text-amber-400 mt-0.5">•</span>
+                                        <span>We do not guarantee 100% error detection</span>
+                                    </li>
+                                    <li className="flex items-start gap-2">
+                                        <span className="text-amber-400 mt-0.5">•</span>
+                                        <span>Continuous improvements are being made to enhance reliability</span>
+                                    </li>
+                                </ul>
                             </div>
                         </div>
                     </section>
