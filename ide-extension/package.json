@@ -3,7 +3,11 @@
     "displayName": "Rootly – Debug production errors directly in your IDE",
     "description": "View production errors from your deployed applications directly in VS Code",
     "version": "1.1.0",
-    "publisher": "rootly",
+    "publisher": "ArinJain",
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/Lancerhawk/Project-Rootly.git"
+    },
     "icon": "resources/icon.png",
     "engines": {
         "vscode": "^1.85.0"
