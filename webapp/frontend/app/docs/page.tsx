@@ -403,7 +403,7 @@ ROOTLY_API_KEY=your_api_key_here`}
 
                     {/* SDK Features */}
                     <section className="mb-16">
-                        <h2 className="text-3xl font-bold mb-6">SDK Features (v1.2.0)</h2>
+                        <h2 className="text-3xl font-bold mb-6">SDK Features (v1.2.3)</h2>
                         <div className="grid md:grid-cols-2 gap-6">
                             {/* Production Hardening */}
                             <div className="bg-gradient-to-br from-zinc-900 to-zinc-900/50 border border-zinc-800 rounded-xl p-6 hover:border-indigo-600/50 transition-all">
@@ -620,7 +620,7 @@ app.use((err, req, res, next) => {
                             </p>
                             <div className="grid md:grid-cols-2 gap-6">
                                 <div className="bg-black/30 rounded-lg p-6 border border-zinc-800">
-                                    <h4 className="font-semibold mb-3 text-indigo-400">Runtime SDK (v1.2.0)</h4>
+                                    <h4 className="font-semibold mb-3 text-indigo-400">Runtime SDK (v1.2.3)</h4>
                                     <p className="text-sm text-zinc-400">
                                         NPM package with zero dependencies. Captures errors with deduplication, rate limiting, and graceful shutdown. Fail-silent design never crashes your app.
                                     </p>
