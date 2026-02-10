@@ -1,0 +1,28 @@
+{
+    "name": "rootly-production-test",
+    "version": "1.0.0",
+    "description": "Production-grade test application for Rootly SDK on Render",
+    "main": "index.js",
+    "scripts": {
+        "start": "node index.js",
+        "dev": "nodemon index.js"
+    },
+    "keywords": [
+        "rootly",
+        "error-tracking",
+        "render"
+    ],
+    "author": "Rootly",
+    "license": "MIT",
+    "dependencies": {
+        "express": "^4.18.2",
+        "rootly-runtime": "^1.2.3",
+        "dotenv": "^16.3.1"
+    },
+    "devDependencies": {
+        "nodemon": "^3.0.2"
+    },
+    "engines": {
+        "node": ">=18.0.0"
+    }
+}

@@ -1,6 +1,12 @@
 # rootly-runtime
 
-Production-grade runtime error tracking for Node.js applications.
+Runtime error tracking SDK for Node.js applications. Captures production errors and sends them to your Rootly dashboard with full context and stack traces.
+
+## What is this?
+
+`rootly-runtime` is a lightweight error tracking library that monitors your Node.js application for errors and automatically reports them to Rootly. When an error occurs in production, you'll see it in your IDE with the exact line of code that caused it, along with the full stack trace and request context.
+
+**IMPORTANT: This SDK is currently in beta.** While we've tested it extensively, some errors may not be captured reliably across all platforms and scenarios. We do not guarantee 100% error detection. Manual `capture()` calls are the most reliable method across all environments.
 
 ## Installation
 
@@ -8,89 +14,151 @@ Production-grade runtime error tracking for Node.js applications.
 npm install rootly-runtime
 ```
 
-## Quick Start
+## Basic Setup
 
-```typescript
-import { init } from 'rootly-runtime';
+Add these two lines at the very top of your application entry point (before any other imports):
 
-// Initialize at app startup
-init({
-  apiKey: process.env.ROOTLY_API_KEY!,
-});
-
-// That's it! All unhandled errors are now captured
-```
-
-## Usage
-
-### Basic Setup (Required)
-
-```typescript
-import { init } from 'rootly-runtime';
+```javascript
+const { init } = require('rootly-runtime');
 
 init({
-  apiKey: process.env.ROOTLY_API_KEY!,  // Required: Get from Rootly dashboard
-  environment: 'production',             // Optional: 'production' or 'preview' (default: NODE_ENV)
-  debug: true                            // Optional: Enable debug logging (default: false)
+  apiKey: process.env.ROOTLY_API_KEY
 });
 ```
 
-**What happens automatically:**
-- ✅ Captures all `uncaughtException` errors
-- ✅ Captures all `unhandledRejection` errors  
-- ✅ Deduplicates identical errors (10s window)
-- ✅ Rate limits to 20 errors/60s
-- ✅ Auto-detects commit SHA from environment
-- ✅ Graceful shutdown handling
+That's it. The SDK will now automatically capture uncaught exceptions and unhandled promise rejections.
 
-### Manual Error Capture
+## How It Works
 
-```typescript
-import { capture } from 'rootly-runtime';
+Once initialized, the SDK:
 
-try {
-  // Your code...
-} catch (error) {
-  // Capture with custom context
-  capture(error, { 
-    user_id: '12345',
-    action: 'checkout',
-    amount: 99.99
-  });
-  
-  // Handle error gracefully
-  res.status(500).json({ error: 'Something went wrong' });
+1. Registers global error handlers for `uncaughtException` and `unhandledRejection`
+2. Captures error details (message, stack trace, environment info)
+3. Sends error reports to Rootly's backend via HTTP POST
+4. Deduplicates identical errors (10-second window)
+5. Rate limits to prevent overwhelming your dashboard (20 errors per 60 seconds)
+
+The SDK is designed to fail silently - if it encounters any issues sending error reports, it will not crash your application.
+
+## Configuration Options
+
+```javascript
+init({
+  apiKey: 'your-api-key',        // Required: Get this from your Rootly dashboard
+  environment: 'production',     // Optional: 'production' or 'preview' (default: NODE_ENV)
+  debug: false                   // Optional: Enable debug logging (default: false)
+});
+```
+
+### Environment Detection
+
+The SDK normalizes environment values:
+- `'production'` or `'prod'` → `'production'`
+- Anything else → `'preview'`
+
+If you don't specify an environment, it uses `process.env.NODE_ENV` or defaults to `'production'`.
+
+## Usage Examples
+
+### Automatic Error Capture
+
+The SDK automatically captures these error types:
+
+```javascript
+// Uncaught exceptions
+throw new Error('Something went wrong');
+
+// Unhandled promise rejections
+Promise.reject(new Error('Async operation failed'));
+
+// Async/await errors (if not caught)
+async function fetchData() {
+  throw new Error('Database connection failed');
 }
 ```
 
-### Severity Levels (New in v1.2.0)
+### Manual Error Capture
 
-```typescript
-import { capture } from 'rootly-runtime';
+For errors you catch in try/catch blocks, use `capture()` to report them:
 
+```javascript
+const { capture } = require('rootly-runtime');
+
+try {
+  const result = riskyOperation();
+} catch (error) {
+  // Send to Rootly with additional context
+  capture(error, {
+    user_id: '12345',
+    action: 'checkout',
+    cart_total: 99.99
+  });
+  
+  // Handle the error gracefully
+  res.status(500).json({ error: 'Payment processing failed' });
+}
+```
+
+The second parameter accepts any JSON-serializable object. This context will appear in your Rootly dashboard alongside the error.
+
+### Severity Levels
+
+You can specify error severity as the third parameter:
+
+```javascript
 // Error (default)
 capture(error, { user_id: '123' }, 'error');
 
 // Warning
-capture(error, { deprecation: 'old_api' }, 'warning');
+capture(new Error('Deprecated API used'), { endpoint: '/old-api' }, 'warning');
 
 // Info
-capture(error, { event: 'migration_complete' }, 'info');
+capture(new Error('Migration completed'), { records: 1000 }, 'info');
 ```
 
-### Wrap Functions (Auto-Capture)
+### Express Middleware
 
-```typescript
-import { wrap } from 'rootly-runtime';
+For Express applications, use the error handler middleware to automatically capture 5xx errors:
 
-// Wrap sync functions
-const processPayment = wrap((amount: number) => {
-  if (amount < 0) throw new Error('Invalid amount');
-  // Process payment...
+```javascript
+const express = require('express');
+const { init, expressErrorHandler } = require('rootly-runtime');
+
+init({ apiKey: process.env.ROOTLY_API_KEY });
+
+const app = express();
+
+// Your routes
+app.get('/api/users', (req, res) => {
+  // Your code
 });
 
-// Wrap async functions
-const fetchUser = wrap(async (userId: string) => {
+// Add Rootly error handler BEFORE your final error handler
+app.use(expressErrorHandler());
+
+// Your final error handler
+app.use((err, req, res, next) => {
+  res.status(500).json({ error: err.message });
+});
+```
+
+The middleware only captures errors when `res.statusCode >= 500`. It ignores 4xx errors (validation, authentication, etc.) and adds Express-specific context like HTTP method, path, and status code.
+
+### Function Wrapping
+
+Wrap functions to automatically capture and re-throw errors:
+
+```javascript
+const { wrap } = require('rootly-runtime');
+
+// Synchronous function
+const processPayment = wrap((amount) => {
+  if (amount < 0) throw new Error('Invalid amount');
+  return { success: true };
+});
+
+// Async function
+const fetchUser = wrap(async (userId) => {
   const response = await fetch(`/api/users/${userId}`);
   if (!response.ok) throw new Error('User not found');
   return response.json();
@@ -101,197 +169,172 @@ try {
   await fetchUser('123');
 } catch (error) {
   // Error was sent to Rootly, now handle it
+  console.error('Failed to fetch user');
 }
 ```
 
-### Express Middleware (5xx Error Capture)
+### Serverless Functions (Vercel, AWS Lambda)
 
-```typescript
-import express from 'express';
-import { init, expressErrorHandler } from 'rootly-runtime';
+For serverless environments, use `flush()` to ensure error reports complete before the function exits:
 
-init({ apiKey: process.env.ROOTLY_API_KEY! });
+```javascript
+const { init, capture, flush } = require('rootly-runtime');
 
-const app = express();
+init({ apiKey: process.env.ROOTLY_API_KEY });
 
-// Your routes
-app.get('/api/users', async (req, res) => {
-  // Your code...
-});
-
-// Add Rootly error handler BEFORE your final error handler
-app.use(expressErrorHandler());
-
-// Your final error handler
-app.use((err, req, res, next) => {
-  res.status(500).json({ error: err.message });
-});
-
-app.listen(3000);
+export default async function handler(req, res) {
+  try {
+    const result = await processRequest(req);
+    res.status(200).json(result);
+  } catch (error) {
+    await capture(error, { path: req.url });
+    await flush(); // Wait for error to be sent
+    res.status(500).json({ error: 'Internal server error' });
+  }
+}
 ```
 
-**Behavior**:
-- ✅ Captures errors when `res.statusCode >= 500`
-- ❌ Ignores 4xx errors (validation, auth, etc.)
-- Adds Express context: `method`, `path`, `status_code`, `source: 'express'`
-- Always calls `next(err)` to continue error chain
+**Note:** Automatic error capture (uncaught exceptions, unhandled rejections) may not work reliably in Vercel serverless functions due to platform limitations. Use manual `capture()` calls for guaranteed error reporting in serverless environments.
 
-## Configuration
+## Platform Support
 
-### Required
+The SDK has been tested on:
 
-- `apiKey` - Your Rootly API key from the dashboard
+- Traditional Node.js servers
+- Express.js applications
+- Render deployments
+- Railway deployments
+- GitHub Actions
+- Vercel (manual capture only)
+- AWS Lambda (manual capture recommended)
 
-### Optional
-
-- `environment` - `'production'` or `'preview'` (default: `process.env.NODE_ENV` or `'production'`)
-  - `'production'` or `'prod'` → normalized to `'production'`
-  - All other values → normalized to `'preview'`
-- `debug` - Enable debug logging to stderr (default: `false`)
-
-### Advanced: Custom Backend URL
-
-For development, staging, or self-hosted deployments, set the `ROOTLY_API_URL` environment variable:
-
-```bash
-# Development
-export ROOTLY_API_URL=http://localhost:5000
-
-# Staging
-export ROOTLY_API_URL=https://staging.rootly.io
-
-# Self-hosted
-export ROOTLY_API_URL=https://rootly.your-company.com
-```
-
-**Note**: This is an advanced feature. Normal users should not configure this.
-
-## Features
-
-### Production-Grade Hardening (v1.2.0)
-
-- ✅ **Environment Normalization** - Automatic production/preview normalization
-- ✅ **Recursive Capture Protection** - Prevents infinite loops if SDK throws
-- ✅ **Stable Fingerprinting** - Consistent error deduplication
-- ✅ **Severity Support** - error/warning/info levels
-- ✅ **Hard Memory Cap** - Max 500 fingerprints (auto-cleanup)
-- ✅ **Optimized Rate Limiter** - O(n) performance
-- ✅ **Debug Mode** - Optional stderr logging
-- ✅ **Real Graceful Shutdown** - Tracks pending requests
-
-### Core Features
-
-- ✅ Zero dependencies (uses native Node.js `https` module)
-- ✅ Captures `uncaughtException` and `unhandledRejection`
-- ✅ Express middleware for 5xx server errors
-- ✅ Manual error capture with custom context
-- ✅ Function wrapping for auto-capture
-- ✅ Auto-detects commit SHA from multiple platforms
-- ✅ Production-safe (never crashes your app)
-- ✅ Minimal overhead (283 lines total)
-
-### Production Safety
-
-- ✅ **Error Deduplication** - Same error within 10s sent only once
-- ✅ **Rate Limiting** - Max 20 errors per 60 seconds
-- ✅ **Graceful Shutdown** - Handles SIGTERM and beforeExit
-- ✅ **Fail-Silent** - Never throws errors internally
-- ✅ **No Retries** - Keeps it simple
-- ✅ **No Queueing** - Immediate send
-
-## Commit SHA Detection
-
-The SDK automatically detects commit SHA from environment variables (in priority order):
-
-1. `VERCEL_GIT_COMMIT_SHA` (Vercel)
-2. `RENDER_GIT_COMMIT` (Render)
-3. `GITHUB_SHA` (GitHub Actions)
-4. `COMMIT_SHA` (Custom)
-
-### Manual Setup
-
-For platforms without auto-detection:
-
-```bash
-# Docker
-docker run -e COMMIT_SHA=$(git rev-parse HEAD) your-image
-
-# Other platforms
-export COMMIT_SHA=$(git rev-parse HEAD)
-```
+**Beta Notice:** Error capture reliability varies across platforms. Some errors may not be captured consistently. Manual `capture()` is the most reliable method.
 
 ## API Reference
 
-### `init(options: InitOptions): void`
+### `init(options)`
 
-Initialize the SDK. Must be called before other functions.
+Initialize the SDK. Must be called before any other SDK functions.
 
-**Options**:
-- `apiKey: string` - Required. Your Rootly API key
-- `environment?: 'production' | 'preview'` - Optional. Defaults to `process.env.NODE_ENV` or `'production'`
-- `debug?: boolean` - Optional. Enable debug logging. Defaults to `false`
+**Parameters:**
+- `options.apiKey` (string, required) - Your Rootly API key
+- `options.environment` (string, optional) - Environment name ('production' or 'preview')
+- `options.debug` (boolean, optional) - Enable debug logging
 
-### `capture(error: Error, extraContext?: object, severity?: 'error' | 'warning' | 'info'): void`
+**Returns:** void
 
-Manually capture an error with optional custom context and severity.
+### `capture(error, context?, severity?)`
 
-**Example**:
+Manually capture an error.
+
+**Parameters:**
+- `error` (Error | string, required) - The error to capture
+- `context` (object, optional) - Additional context (must be JSON-serializable)
+- `severity` ('error' | 'warning' | 'info', optional) - Error severity (default: 'error')
+
+**Returns:** Promise<void>
+
+### `wrap(fn)`
+
+Wrap a function to automatically capture errors.
+
+**Parameters:**
+- `fn` (Function, required) - Function to wrap (sync or async)
+
+**Returns:** Wrapped function that captures and re-throws errors
+
+### `expressErrorHandler()`
+
+Express middleware for automatic 5xx error capture.
+
+**Returns:** Express error handler middleware
+
+### `flush(timeout?)`
+
+Wait for all pending error reports to complete.
+
+**Parameters:**
+- `timeout` (number, optional) - Max wait time in milliseconds (default: 5000)
+
+**Returns:** Promise<void>
+
+## Environment Variables
+
+The SDK automatically detects commit SHA from these environment variables:
+
+- `RENDER_GIT_COMMIT` (Render)
+- `RAILWAY_GIT_COMMIT_SHA` (Railway)
+- `VERCEL_GIT_COMMIT_SHA` (Vercel)
+- `GITHUB_SHA` (GitHub Actions)
+
+You can also set `ROOTLY_API_URL` to use a custom backend endpoint (defaults to `https://rootly-backend.onrender.com`).
+
+## Error Deduplication
+
+The SDK deduplicates errors based on a fingerprint generated from:
+- Error message
+- Stack trace
+- File path and line number
+
+Identical errors within a 10-second window are deduplicated to prevent spam.
+
+## Rate Limiting
+
+To prevent overwhelming your dashboard, the SDK limits error reporting to 20 errors per 60 seconds. Additional errors are dropped silently.
+
+## Fail-Silent Design
+
+The SDK is designed to never crash your application. If error reporting fails (network issues, invalid API key, etc.), the SDK logs the failure (if debug mode is enabled) and continues silently.
+
+## TypeScript Support
+
+The SDK includes TypeScript type definitions:
+
 ```typescript
-capture(new Error('Payment failed'), { 
-  user_id: '123',
-  amount: 99.99 
-}, 'error');
-```
+import { init, capture, wrap, expressErrorHandler, flush } from 'rootly-runtime';
 
-### `wrap<T>(fn: T): T`
-
-Wrap a function to automatically capture errors. Works with both sync and async functions.
-
-**Example**:
-```typescript
-const safeFunction = wrap(() => {
-  // Your code that might throw
+init({
+  apiKey: process.env.ROOTLY_API_KEY!,
+  environment: 'production',
+  debug: true
 });
+
+capture(new Error('Type-safe error'), { userId: 123 }, 'error');
 ```
 
-### `expressErrorHandler(): ExpressErrorHandler`
+## Troubleshooting
 
-Express middleware for capturing 5xx errors. Place before your final error handler.
+### Errors not appearing in dashboard
 
-**Example**:
-```typescript
-app.use(expressErrorHandler());
-app.use((err, req, res, next) => {
-  res.status(500).json({ error: err.message });
-});
+1. Check your API key is correct
+2. Enable debug mode: `init({ apiKey: '...', debug: true })`
+3. Check console for SDK debug messages
+4. Verify network connectivity to Rootly backend
+5. Try manual `capture()` to test connectivity
+
+### Serverless functions timing out
+
+Use `flush()` to wait for error reports:
+
+```javascript
+await capture(error);
+await flush(2000); // Wait up to 2 seconds
 ```
 
-## Changelog
+### Too many errors being captured
 
-### v1.2.0 (2026-02-09)
-
-**Production Hardening Release**
-
-- ✅ Environment normalization with NODE_ENV fallback
-- ✅ Removed `apiUrl` from public API (use `ROOTLY_API_URL` env var)
-- ✅ Recursive capture protection using Symbol flag
-- ✅ Stable fingerprinting algorithm
-- ✅ Severity support (error/warning/info)
-- ✅ Hard memory cap (500 max fingerprints)
-- ✅ Optimized rate limiter (O(n) performance)
-- ✅ Debug mode with stderr logging
-- ✅ Real graceful shutdown tracking
-- ✅ Fixed listener guard bug (SDK now always registers)
-- ✅ Fixed transport decrement bug
-- ✅ Nullish coalescing for severity
-
-### v1.0.0 (2026-02-08)
-
-- Initial release
-- Basic error capture and reporting
-- Express middleware
-- Function wrapping
+The SDK automatically rate limits to 20 errors per 60 seconds. If you're hitting this limit, you may have a critical bug causing error loops.
 
 ## License
 
 MIT
+
+## Support
+
+For issues and questions:
+- GitHub: https://github.com/Lancerhawk/Project-Rootly
+- Documentation: https://rootly-webapp.vercel.app/docs
+
+## Changelog
+
+See [CHANGELOG.md](./CHANGELOG.md) for version history and release notes.
