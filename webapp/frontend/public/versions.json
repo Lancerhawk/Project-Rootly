@@ -54,7 +54,7 @@
             "version": "1.2.1",
             "name": "Serverless Support (Partial)",
             "releaseDate": "2026-02-09",
-            "status": "current",
+            "status": "implemented",
             "description": "Async/await SDK with flush() method for serverless environments. ⚠️ Vercel serverless functions currently only support manual capture - automatic error capture coming soon",
             "features": [
                 {
