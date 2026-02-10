@@ -23,71 +23,234 @@ const users = [
 ];
 
 // ============================================
-// HOME - Test Categories
+// HOME - Interactive Test UI
 // ============================================
 app.get('/', (req, res) => {
-    res.json({
-        status: 'ok',
-        message: 'Rootly SDK Comprehensive Test Suite',
-        version: '1.0.0',
-        categories: {
-            'Normal Operations': {
-                description: 'Working endpoints that should NOT generate errors',
-                endpoints: [
-                    'GET /health',
-                    'GET /api/users',
-                    'GET /api/users/1',
-                    'GET /api/calculate?a=10&b=2'
-                ]
-            },
-            'Automatic Error Capture': {
-                description: 'Tests automatic capture of uncaught exceptions and unhandled rejections',
-                endpoints: [
-                    'GET /test/uncaught-exception',
-                    'GET /test/unhandled-rejection',
-                    'GET /test/async-error'
-                ]
-            },
-            'Manual Error Capture': {
-                description: 'Tests manual capture() with context and severity levels',
-                endpoints: [
-                    'GET /test/manual-capture',
-                    'GET /test/capture-with-context',
-                    'GET /test/severity-levels'
-                ]
-            },
-            'Express Middleware': {
-                description: 'Tests Express error handler middleware (5xx errors)',
-                endpoints: [
-                    'GET /test/express-500',
-                    'GET /test/express-404',
-                    'POST /test/express-validation'
-                ]
-            },
-            'Function Wrapping': {
-                description: 'Tests wrap() for automatic error capture',
-                endpoints: [
-                    'GET /test/wrapped-sync',
-                    'GET /test/wrapped-async'
-                ]
-            },
-            'Serverless Simulation': {
-                description: 'Tests flush() for serverless environments',
-                endpoints: [
-                    'GET /test/serverless-handler'
-                ]
-            },
-            'Edge Cases': {
-                description: 'Real-world error scenarios',
-                endpoints: [
-                    'GET /test/null-reference',
-                    'GET /test/type-error',
-                    'GET /test/database-timeout',
-                    'POST /test/payment-error'
-                ]
+    res.send(`
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rootly SDK Test Suite</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { 
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        .container { max-width: 1200px; margin: 0 auto; }
+        h1 { 
+            color: white; 
+            text-align: center; 
+            margin-bottom: 10px;
+            font-size: 2.5em;
+        }
+        .subtitle {
+            color: rgba(255,255,255,0.9);
+            text-align: center;
+            margin-bottom: 30px;
+            font-size: 1.1em;
+        }
+        .category {
+            background: white;
+            border-radius: 12px;
+            padding: 25px;
+            margin-bottom: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+        .category h2 {
+            color: #667eea;
+            margin-bottom: 8px;
+            font-size: 1.5em;
+        }
+        .category p {
+            color: #666;
+            margin-bottom: 15px;
+            font-size: 0.95em;
+        }
+        .expected {
+            background: #f0f4ff;
+            padding: 8px 12px;
+            border-radius: 6px;
+            margin-bottom: 15px;
+            font-size: 0.9em;
+            color: #667eea;
+            font-weight: 600;
+        }
+        .tests {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 10px;
+        }
+        .test-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.9em;
+            transition: transform 0.2s, box-shadow 0.2s;
+            text-align: left;
+        }
+        .test-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+        .test-btn.success {
+            background: linear-gradient(135deg, #56ab2f 0%, #a8e063 100%);
+        }
+        .result {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 8px;
+            background: #f8f9fa;
+            border-left: 4px solid #667eea;
+            display: none;
+        }
+        .result.show { display: block; }
+        .result pre {
+            margin-top: 10px;
+            padding: 10px;
+            background: #fff;
+            border-radius: 4px;
+            overflow-x: auto;
+            font-size: 0.85em;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔍 Rootly SDK Test Suite</h1>
+        <p class="subtitle">Click any button to test SDK features. Check your Rootly dashboard for captured errors.</p>
+
+        <div class="category">
+            <h2>✅ Category 1: Normal Operations</h2>
+            <p>These endpoints work correctly and should NOT generate errors</p>
+            <div class="expected">Expected: 0 errors in Rootly</div>
+            <div class="tests">
+                <button class="test-btn success" onclick="test('/health')">Health Check</button>
+                <button class="test-btn success" onclick="test('/api/users')">Get All Users</button>
+                <button class="test-btn success" onclick="test('/api/users/1')">Get User #1</button>
+                <button class="test-btn success" onclick="test('/api/calculate?a=10&b=2')">Calculate 10+2</button>
+            </div>
+        </div>
+
+        <div class="category">
+            <h2>🔴 Category 2: Automatic Error Capture</h2>
+            <p>Tests SDK's automatic capture of uncaught exceptions and unhandled rejections</p>
+            <div class="expected">Expected: 3 errors in Rootly</div>
+            <div class="tests">
+                <button class="test-btn" onclick="test('/test/uncaught-exception')">Uncaught Exception</button>
+                <button class="test-btn" onclick="test('/test/unhandled-rejection')">Unhandled Rejection</button>
+                <button class="test-btn" onclick="test('/test/async-error')">Async Error</button>
+            </div>
+        </div>
+
+        <div class="category">
+            <h2>📝 Category 3: Manual Error Capture</h2>
+            <p>Tests manual capture() with context and severity levels</p>
+            <div class="expected">Expected: 5 errors in Rootly</div>
+            <div class="tests">
+                <button class="test-btn" onclick="test('/test/manual-capture')">Basic Manual Capture</button>
+                <button class="test-btn" onclick="test('/test/capture-with-context?userId=12345')">Capture with Context</button>
+                <button class="test-btn" onclick="test('/test/severity-levels')">Severity Levels (3 errors)</button>
+            </div>
+        </div>
+
+        <div class="category">
+            <h2>🛠️ Category 4: Express Middleware</h2>
+            <p>Tests Express error handler middleware (only 5xx errors captured)</p>
+            <div class="expected">Expected: 1 error in Rootly (only the 500 error)</div>
+            <div class="tests">
+                <button class="test-btn" onclick="test('/test/express-500')">Express 500 (captured)</button>
+                <button class="test-btn success" onclick="test('/test/express-404')">Express 404 (NOT captured)</button>
+                <button class="test-btn success" onclick="testPost('/test/express-validation', {})">Validation Error (NOT captured)</button>
+            </div>
+        </div>
+
+        <div class="category">
+            <h2>🎁 Category 5: Function Wrapping</h2>
+            <p>Tests wrap() for automatic error capture</p>
+            <div class="expected">Expected: 2 errors in Rootly</div>
+            <div class="tests">
+                <button class="test-btn" onclick="test('/test/wrapped-sync?value=-5')">Wrapped Sync Error</button>
+                <button class="test-btn success" onclick="test('/test/wrapped-sync?value=10')">Wrapped Sync Success</button>
+                <button class="test-btn" onclick="test('/test/wrapped-async')">Wrapped Async Error</button>
+                <button class="test-btn success" onclick="test('/test/wrapped-async?userId=1')">Wrapped Async Success</button>
+            </div>
+        </div>
+
+        <div class="category">
+            <h2>☁️ Category 6: Serverless Simulation</h2>
+            <p>Tests flush() for serverless environments</p>
+            <div class="expected">Expected: 1 error in Rootly</div>
+            <div class="tests">
+                <button class="test-btn success" onclick="test('/test/serverless-handler')">Serverless Success</button>
+                <button class="test-btn" onclick="test('/test/serverless-handler?fail=true')">Serverless Error + Flush</button>
+            </div>
+        </div>
+
+        <div class="category">
+            <h2>⚠️ Category 7: Edge Cases</h2>
+            <p>Real-world error scenarios</p>
+            <div class="expected">Expected: 4-5 errors in Rootly</div>
+            <div class="tests">
+                <button class="test-btn" onclick="test('/test/null-reference?userId=999')">Null Reference Error</button>
+                <button class="test-btn" onclick="test('/test/type-error?a=hello&b=world')">Type Error</button>
+                <button class="test-btn" onclick="test('/test/database-timeout')">Database Timeout</button>
+                <button class="test-btn" onclick="testPost('/test/payment-error', {userId:1,amount:5000})">Payment - Insufficient Funds</button>
+                <button class="test-btn" onclick="testPost('/test/payment-error', {userId:999,amount:100,cardNumber:'1234567890123456'})">Payment - Invalid User</button>
+            </div>
+        </div>
+
+        <div id="result" class="result">
+            <strong>Response:</strong>
+            <pre id="response"></pre>
+        </div>
+    </div>
+
+    <script>
+        async function test(url) {
+            const result = document.getElementById('result');
+            const response = document.getElementById('response');
+            
+            try {
+                const res = await fetch(url);
+                const data = await res.json();
+                response.textContent = JSON.stringify(data, null, 2);
+                result.classList.add('show');
+            } catch (error) {
+                response.textContent = 'Error: ' + error.message;
+                result.classList.add('show');
             }
         }
-    });
+
+        async function testPost(url, body) {
+            const result = document.getElementById('result');
+            const response = document.getElementById('response');
+            
+            try {
+                const res = await fetch(url, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(body)
+                });
+                const data = await res.json();
+                response.textContent = JSON.stringify(data, null, 2);
+                result.classList.add('show');
+            } catch (error) {
+                response.textContent = 'Error: ' + error.message;
+                result.classList.add('show');
+            }
+        }
+    </script>
+</body>
+</html>
+    `);
 });
 
 // ============================================
@@ -132,9 +295,7 @@ app.get('/api/calculate', (req, res) => {
 // CATEGORY 2: AUTOMATIC ERROR CAPTURE
 // ============================================
 
-// Test 1: Uncaught Exception
 app.get('/test/uncaught-exception', (req, res) => {
-    // This will be caught by SDK's uncaughtException handler
     setTimeout(() => {
         throw new Error('Uncaught exception test - This should appear in Rootly');
     }, 100);
@@ -142,17 +303,13 @@ app.get('/test/uncaught-exception', (req, res) => {
     res.json({ message: 'Exception will be thrown asynchronously' });
 });
 
-// Test 2: Unhandled Promise Rejection
 app.get('/test/unhandled-rejection', (req, res) => {
-    // This will be caught by SDK's unhandledRejection handler
     Promise.reject(new Error('Unhandled promise rejection test - This should appear in Rootly'));
 
     res.json({ message: 'Promise rejection triggered' });
 });
 
-// Test 3: Async Function Error (not caught)
 app.get('/test/async-error', async (req, res) => {
-    // Intentionally not using try/catch
     await failingAsyncOperation();
     res.json({ message: 'This will never be reached' });
 });
@@ -165,12 +322,10 @@ async function failingAsyncOperation() {
 // CATEGORY 3: MANUAL ERROR CAPTURE
 // ============================================
 
-// Test 4: Basic Manual Capture
 app.get('/test/manual-capture', async (req, res) => {
     try {
         throw new Error('Manual capture test');
     } catch (error) {
-        // Manually capture the error
         await capture(error);
         res.json({
             message: 'Error captured manually',
@@ -179,13 +334,11 @@ app.get('/test/manual-capture', async (req, res) => {
     }
 });
 
-// Test 5: Capture with Context
 app.get('/test/capture-with-context', async (req, res) => {
     try {
         const userId = req.query.userId || '12345';
         throw new Error('Operation failed with context');
     } catch (error) {
-        // Capture with additional context
         await capture(error, {
             user_id: req.query.userId || '12345',
             action: 'test_operation',
@@ -204,10 +357,8 @@ app.get('/test/capture-with-context', async (req, res) => {
     }
 });
 
-// Test 6: Severity Levels
 app.get('/test/severity-levels', async (req, res) => {
     try {
-        // Capture with different severity levels
         await capture(
             new Error('This is an ERROR level message'),
             { test: 'severity_error' },
@@ -239,21 +390,18 @@ app.get('/test/severity-levels', async (req, res) => {
 // CATEGORY 4: EXPRESS MIDDLEWARE
 // ============================================
 
-// Test 7: Express 5xx Error (Should be captured)
 app.get('/test/express-500', (req, res, next) => {
     const error = new Error('Express 5xx error test');
     error.status = 500;
     next(error);
 });
 
-// Test 8: Express 4xx Error (Should NOT be captured)
 app.get('/test/express-404', (req, res, next) => {
     const error = new Error('Resource not found');
     error.status = 404;
     next(error);
 });
 
-// Test 9: Validation Error (Should NOT be captured - 400)
 app.post('/test/express-validation', (req, res, next) => {
     const error = new Error('Validation failed');
     error.status = 400;
@@ -264,7 +412,6 @@ app.post('/test/express-validation', (req, res, next) => {
 // CATEGORY 5: FUNCTION WRAPPING
 // ============================================
 
-// Wrapped synchronous function
 const wrappedSyncFunction = wrap((value) => {
     if (value < 0) {
         throw new Error('Wrapped sync function error - negative value not allowed');
@@ -272,13 +419,11 @@ const wrappedSyncFunction = wrap((value) => {
     return value * 2;
 });
 
-// Wrapped async function
 const wrappedAsyncFunction = wrap(async (userId) => {
     if (!userId) {
         throw new Error('Wrapped async function error - userId required');
     }
 
-    // Simulate async operation
     await new Promise(resolve => setTimeout(resolve, 100));
 
     const user = users.find(u => u.id === parseInt(userId));
@@ -289,7 +434,6 @@ const wrappedAsyncFunction = wrap(async (userId) => {
     return user;
 });
 
-// Test 10: Wrapped Sync Function
 app.get('/test/wrapped-sync', (req, res) => {
     try {
         const value = parseInt(req.query.value || '-5');
@@ -303,7 +447,6 @@ app.get('/test/wrapped-sync', (req, res) => {
     }
 });
 
-// Test 11: Wrapped Async Function
 app.get('/test/wrapped-async', async (req, res) => {
     try {
         const userId = req.query.userId;
@@ -321,10 +464,8 @@ app.get('/test/wrapped-async', async (req, res) => {
 // CATEGORY 6: SERVERLESS SIMULATION
 // ============================================
 
-// Test 12: Serverless Handler with flush()
 app.get('/test/serverless-handler', async (req, res) => {
     try {
-        // Simulate serverless function
         const shouldFail = req.query.fail === 'true';
 
         if (shouldFail) {
@@ -336,13 +477,11 @@ app.get('/test/serverless-handler', async (req, res) => {
             message: 'Serverless function completed'
         });
     } catch (error) {
-        // Capture error and flush before response
         await capture(error, {
             function: 'serverless-handler',
             cold_start: false
         });
 
-        // Wait for error to be sent (important in serverless)
         await flush(2000);
 
         res.status(500).json({
@@ -353,40 +492,31 @@ app.get('/test/serverless-handler', async (req, res) => {
 });
 
 // ============================================
-// CATEGORY 7: EDGE CASES (Real-World Errors)
+// CATEGORY 7: EDGE CASES
 // ============================================
 
-// Test 13: Null Reference Error
 app.get('/test/null-reference', (req, res, next) => {
     try {
         const userId = parseInt(req.query.userId || '999');
         const user = users.find(u => u.id === userId);
-
-        // BUG: Not checking if user exists
         const userName = user.name.toUpperCase();
-
         res.json({ success: true, userName });
     } catch (error) {
         next(error);
     }
 });
 
-// Test 14: Type Error
 app.get('/test/type-error', (req, res, next) => {
     try {
         const a = req.query.a;
         const b = req.query.b;
-
-        // BUG: Not validating types
         const result = a.toFixed(2) / b.toFixed(2);
-
         res.json({ success: true, result });
     } catch (error) {
         next(error);
     }
 });
 
-// Test 15: Database Timeout Simulation
 app.get('/test/database-timeout', async (req, res, next) => {
     try {
         const result = await simulateDatabaseQuery();
@@ -399,7 +529,6 @@ app.get('/test/database-timeout', async (req, res, next) => {
 async function simulateDatabaseQuery() {
     return new Promise((resolve, reject) => {
         setTimeout(() => {
-            // Randomly fail to simulate timeout
             if (Math.random() > 0.5) {
                 reject(new Error('Database connection timeout'));
             } else {
@@ -409,21 +538,16 @@ async function simulateDatabaseQuery() {
     });
 }
 
-// Test 16: Payment Processing Error
 app.post('/test/payment-error', async (req, res, next) => {
     try {
         const { userId, amount, cardNumber } = req.body;
-
         const user = users.find(u => u.id === userId);
 
-        // BUG: Not checking if user exists
         if (user.balance < amount) {
             throw new Error(`Insufficient funds. Required: ${amount}, Available: ${user.balance}`);
         }
 
-        // BUG: Not validating cardNumber
         const lastFour = cardNumber.slice(-4);
-
         user.balance -= amount;
 
         res.json({
@@ -441,10 +565,8 @@ app.post('/test/payment-error', async (req, res, next) => {
 // ERROR HANDLERS
 // ============================================
 
-// Add Rootly Express error handler BEFORE final error handler
 app.use(expressErrorHandler());
 
-// Final error handler
 app.use((err, req, res, next) => {
     console.error('Error:', err.message);
 
@@ -470,6 +592,6 @@ app.listen(PORT, () => {
     console.log(`Environment: ${process.env.NODE_ENV || 'production'}`);
     console.log(`Debug mode: enabled`);
     console.log('');
-    console.log(`Visit http://localhost:${PORT} for test categories`);
+    console.log(`Visit http://localhost:${PORT} for interactive test UI`);
     console.log('='.repeat(60));
 });
