@@ -1,6 +1,55 @@
 {
-    "currentVersion": "1.2.1",
+    "currentVersion": "1.2.2",
     "versions": [
+        {
+            "version": "1.2.2",
+            "name": "SDK and IDE Extension Fixes",
+            "releaseDate": "2026-02-10",
+            "status": "current",
+            "description": "Critical fixes for Express error handling, commit SHA validation, and IDE extension file path resolution",
+            "features": [
+                {
+                    "title": "SDK v1.2.6 - Express Error Handling Fix",
+                    "description": "Fixed Express middleware to properly detect 5xx errors by checking err.status, err.statusCode, or res.statusCode",
+                    "status": "completed"
+                },
+                {
+                    "title": "SDK v1.2.5 - Commit SHA Fallback",
+                    "description": "Added fallback commit SHA (40-char hex) when environment variables are not available to prevent backend validation errors",
+                    "status": "completed"
+                },
+                {
+                    "title": "IDE Extension v1.1.2 - File Path Resolution",
+                    "description": "Fixed file navigation to extract filename from absolute Windows paths, enabling Go to Error Location to work at any workspace level",
+                    "status": "completed"
+                },
+                {
+                    "title": "IDE Extension v1.1.1 - Stack Trace Parsing",
+                    "description": "Updated regex to handle Windows file paths with spaces, file locations now display in incident list",
+                    "status": "completed"
+                }
+            ],
+            "technicalDetails": {
+                "sdk": [
+                    "Express middleware checks err.status || err.statusCode || res.statusCode || 500",
+                    "Fallback commit SHA: 0000000000000000000000000000000000000000",
+                    "Prevents backend validation errors in local development",
+                    "Published to npm as rootly-runtime@1.2.6"
+                ],
+                "ideExtension": [
+                    "Extracts filename from absolute paths before workspace search",
+                    "Regex pattern handles Windows paths with spaces",
+                    "File locations display as filename:line in incident list",
+                    "Published to VS Code Marketplace as v1.1.2"
+                ],
+                "bugFixes": [
+                    "Express 5xx errors now captured correctly",
+                    "SDK works in local development without Git SHA",
+                    "Go to Error Location works regardless of workspace root",
+                    "Stack traces with spaces parse correctly"
+                ]
+            }
+        },
         {
             "version": "1.2.1",
             "name": "Serverless Support (Partial)",

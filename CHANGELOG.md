@@ -7,6 +7,42 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+
+## [1.2.2] - 2026-02-10
+
+### SDK Updates
+
+#### rootly-runtime v1.2.6
+- Fixed Express middleware error detection to check err.status, err.statusCode, or res.statusCode
+- Ensures 5xx errors are captured even when response status is not explicitly set
+- Published to npm
+
+#### rootly-runtime v1.2.5
+- Added fallback commit SHA mechanism for local development
+- Provides default 40-character hex SHA when environment variables unavailable
+- Prevents backend validation errors in non-deployed environments
+- Published to npm
+
+### IDE Extension Updates
+
+#### VS Code Extension v1.1.2
+- Fixed file path resolution to extract filename from absolute Windows paths
+- Go to Error Location now works regardless of workspace root directory
+- Published to VS Code Marketplace
+
+#### VS Code Extension v1.1.1
+- Updated stack trace parsing regex to handle Windows paths with spaces
+- File locations now display correctly in incident list (format: filename:line)
+- Published to VS Code Marketplace
+
+### Fixed
+- Express 5xx errors now captured correctly by SDK
+- SDK functions in local development without Git environment variables
+- IDE extension file navigation works at any workspace level
+- Stack traces with Windows paths containing spaces parse correctly
+
+---
+
 ## [1.2.0] - 2026-02-09
 
 ### 🎉 Runtime SDK Production Hardening

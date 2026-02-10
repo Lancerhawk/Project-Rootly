@@ -43,17 +43,25 @@ Rootly provides:
 
 ## ✨ Key Features
 
-### Current (v1.2.0 - Runtime SDK Production Hardening)
+### Current (v1.2.2 - SDK and IDE Extension Fixes)
+
+- ✅ **SDK v1.2.6** - Fixed Express middleware to properly detect 5xx errors
+- ✅ **SDK v1.2.5** - Added commit SHA fallback for local development
+- ✅ **IDE Extension v1.1.2** - Fixed file path resolution for Windows absolute paths
+- ✅ **IDE Extension v1.1.1** - Stack trace parsing handles paths with spaces
+- ✅ **Production Stability** - All critical error capture bugs resolved
+
+### Previously Implemented (v1.2.0 - Runtime SDK Production Hardening)
 
 - ✅ **Production-Ready SDK** - rootly-runtime v1.2.0 with 283 lines of hardened code
-- ✅ **Severity Support** - Capture errors with `error`, `warning`, `info` levels
+- ✅ **Severity Support** - Capture errors with error, warning, info levels
 - ✅ **Environment Normalization** - Automatic production/preview normalization with NODE_ENV fallback
 - ✅ **Debug Mode** - Optional stderr logging for SDK visibility
 - ✅ **Recursive Protection** - Symbol flag prevents infinite loops
 - ✅ **Stable Fingerprinting** - Improved deduplication with normalized whitespace
 - ✅ **Hard Memory Cap** - Max 500 fingerprints with auto-cleanup
 - ✅ **Optimized Rate Limiter** - O(n) performance
-- ✅ **Clean Public API** - Removed `apiUrl` from InitOptions (use `ROOTLY_API_URL` env var)
+- ✅ **Clean Public API** - Removed apiUrl from InitOptions (use ROOTLY_API_URL env var)
 - ✅ **Critical Bug Fixes** - Environment fallback, listener guards, transport counter
 
 ### Previously Implemented (v1.1.0 - IDE Extension Release)
@@ -117,7 +125,6 @@ graph TB
     subgraph "Rootly Platform"
         API[Backend API]
         DB[(PostgreSQL)]
-        WS[WebSocket Server]
     end
     
     subgraph "Authentication"
@@ -127,8 +134,8 @@ graph TB
     App -->|Captures Errors| SDK
     SDK -->|Sends Error Data| API
     API -->|Stores| DB
-    API -->|Real-time Updates| WS
-    WS -->|Notifications| IDE
+    IDE -->|Polls Every 45s| API
+    API -->|Returns Incidents| IDE
     Browser -->|Manages Projects| API
     API -->|Authenticates| GitHub
     GitHub -->|User Info| API
@@ -148,12 +155,14 @@ graph LR
         Dashboard[Dashboard]
         Projects[Project Management]
         Auth[Auth Flow]
+        Docs[Documentation]
     end
     
     subgraph "Backend (Node.js + Express)"
         AuthAPI[Auth Routes]
         ProjectAPI[Project Routes]
-        ErrorAPI[Error Routes - Planned]
+        IngestAPI[Ingest Routes]
+        IncidentsAPI[Incidents Routes]
         Middleware[Auth Middleware]
     end
     
@@ -161,7 +170,7 @@ graph LR
         Users[(Users)]
         ProjectsDB[(Projects)]
         APIKeys[(API Keys)]
-        Errors[(Errors - Planned)]
+        Incidents[(Incidents)]
     end
     
     Landing --> Auth
@@ -172,10 +181,12 @@ graph LR
     AuthAPI --> Users
     ProjectAPI --> ProjectsDB
     ProjectAPI --> APIKeys
-    ErrorAPI -.-> Errors
+    IngestAPI --> Incidents
+    IncidentsAPI --> Incidents
     
     AuthAPI --> Middleware
     ProjectAPI --> Middleware
+    IncidentsAPI --> Middleware
     
     style Landing fill:#4F46E5
     style Backend fill:#10B981
@@ -217,7 +228,7 @@ sequenceDiagram
     Web->>Dev: Show API key (once)
 ```
 
-### Error Tracking Flow (Planned)
+### Error Tracking Flow
 
 ```mermaid
 sequenceDiagram
@@ -226,7 +237,6 @@ sequenceDiagram
     participant SDK as Rootly SDK
     participant API as Rootly API
     participant DB as Database
-    participant WS as WebSocket
     participant IDE as VS Code Extension
     actor Dev as Developer
     
@@ -234,12 +244,18 @@ sequenceDiagram
     App->>SDK: Error caught
     SDK->>SDK: Capture stack trace
     SDK->>SDK: Collect context
-    SDK->>API: POST /api/errors
-    API->>DB: Store error
-    API->>WS: Broadcast error event
-    WS->>IDE: Push notification
-    IDE->>Dev: Show inline error
-    Dev->>IDE: Click error
+    SDK->>API: POST /api/ingest
+    API->>DB: Store incident
+    API-->>SDK: 201 Created
+    
+    Note over IDE: Polls every 45 seconds
+    IDE->>API: GET /api/incidents
+    API->>DB: Query incidents
+    DB-->>API: Return incidents
+    API-->>IDE: Incident list
+    IDE->>Dev: Show notification
+    Dev->>IDE: Click incident
+    IDE->>IDE: Parse stack trace
     IDE->>Dev: Jump to code location
     Dev->>App: Fix the bug
 ```
