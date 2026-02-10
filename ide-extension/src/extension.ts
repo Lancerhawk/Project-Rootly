@@ -97,10 +97,13 @@ export function activate(context: vscode.ExtensionContext) {
 
     // Register Go to Error command
     context.subscriptions.push(
-        vscode.commands.registerCommand('rootly.goToError', async (file: string, line: number) => {
+        vscode.commands.registerCommand('rootly.goToError', async (filePath: string, line: number) => {
             const workspaceFolders = vscode.workspace.workspaceFolders;
             if (workspaceFolders && workspaceFolders.length > 0) {
-                const files = await vscode.workspace.findFiles(`**/${file}`, '**/node_modules/**', 1);
+                // Extract just the filename from the full path (handles both Unix and Windows paths)
+                const fileName = filePath.split('/').pop() || filePath.split('\\').pop() || filePath;
+
+                const files = await vscode.workspace.findFiles(`**/${fileName}`, '**/node_modules/**', 1);
                 if (files.length > 0) {
                     const document = await vscode.workspace.openTextDocument(files[0]);
                     const editor = await vscode.window.showTextDocument(document);
@@ -111,7 +114,7 @@ export function activate(context: vscode.ExtensionContext) {
                     editor.selection = new vscode.Selection(position, position);
                     editor.revealRange(new vscode.Range(position, position), vscode.TextEditorRevealType.InCenter);
                 } else {
-                    vscode.window.showWarningMessage(`File not found in workspace: ${file}`);
+                    vscode.window.showWarningMessage(`File not found in workspace: ${fileName}`);
                 }
             } else {
                 vscode.window.showWarningMessage('No workspace folder open');
@@ -516,7 +519,10 @@ function showIncidentDetails(incident: Incident) {
                 // Try to find and open the file
                 const workspaceFolders = vscode.workspace.workspaceFolders;
                 if (workspaceFolders && workspaceFolders.length > 0) {
-                    const files = await vscode.workspace.findFiles(`**/${message.file}`, '**/node_modules/**', 1);
+                    // Extract just the filename from the full path (handles both Unix and Windows paths)
+                    const fileName = message.file.split('/').pop() || message.file.split('\\').pop() || message.file;
+
+                    const files = await vscode.workspace.findFiles(`**/${fileName}`, '**/node_modules/**', 1);
                     if (files.length > 0) {
                         const document = await vscode.workspace.openTextDocument(files[0]);
                         const editor = await vscode.window.showTextDocument(document);
@@ -527,7 +533,7 @@ function showIncidentDetails(incident: Incident) {
                         editor.selection = new vscode.Selection(position, position);
                         editor.revealRange(new vscode.Range(position, position), vscode.TextEditorRevealType.InCenter);
                     } else {
-                        vscode.window.showWarningMessage(`File not found in workspace: ${message.file}`);
+                        vscode.window.showWarningMessage(`File not found in workspace: ${fileName}`);
                     }
                 } else {
                     vscode.window.showWarningMessage('No workspace folder open');

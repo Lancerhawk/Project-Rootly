@@ -5,6 +5,14 @@ All notable changes to the Rootly VS Code extension are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+
+## [1.1.2] - 2026-02-10
+
+### Fixed
+- File path resolution now correctly extracts filename from absolute Windows paths
+- "Go to Error Location" button now works when workspace is opened at any level
+- Fixed issue where extension could not find files that exist in workspace
+
 ## [1.1.1] - 2026-02-10
 
 ### Fixed
