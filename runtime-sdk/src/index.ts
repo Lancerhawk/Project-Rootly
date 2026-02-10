@@ -92,13 +92,19 @@ export function expressErrorHandler() {
     return async (err: any, req: any, res: any, next: any) => {
         try {
             if (!apiKey) return next(err);
-            if (res.statusCode >= 500) {
+
+            // Check error status code (err.status or err.statusCode) OR response status code
+            // This handles both cases: errors with status set, and already-sent responses
+            const statusCode = err.status || err.statusCode || res.statusCode || 500;
+
+            // Only capture 5xx errors (server errors), not 4xx (client errors)
+            if (statusCode >= 500) {
                 const error = err instanceof Error ? err : new Error(String(err));
                 const extraContext = {
                     source: 'express',
                     method: req.method,
                     path: req.path || req.url,
-                    status_code: res.statusCode,
+                    status_code: statusCode,
                 };
                 // Await the capture to ensure it completes before response is sent
                 await captureError(error, apiKey, environment, apiUrl, extraContext);

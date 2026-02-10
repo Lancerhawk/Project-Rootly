@@ -1,6 +1,6 @@
 {
     "name": "rootly-runtime",
-    "version": "1.2.5",
+    "version": "1.2.6",
     "description": "Minimal runtime error tracking for Node.js production apps",
     "main": "dist/index.js",
     "types": "dist/index.d.ts",
