@@ -1,76 +1,124 @@
 #!/bin/bash
 
-# Rootly Production Test - Automated Error Testing Script
-# This script tests all error scenarios and verifies SDK capture
+# Rootly SDK Comprehensive Test Suite
+# Tests all SDK features documented in README
 
-echo "🧪 Starting Rootly Production Test Suite"
+echo "=========================================="
+echo "Rootly SDK Comprehensive Test Suite"
 echo "=========================================="
 echo ""
 
 BASE_URL="${1:-http://localhost:3000}"
-
-echo "📍 Testing against: $BASE_URL"
+echo "Testing against: $BASE_URL"
 echo ""
 
-# Color codes
+# Colors
 RED='\033[0;31m'
 GREEN='\033[0;32m'
 YELLOW='\033[1;33m'
-NC='\033[0m' # No Color
+BLUE='\033[0;34m'
+NC='\033[0m'
 
 test_count=0
-error_count=0
 
 run_test() {
     test_count=$((test_count + 1))
-    echo -e "${YELLOW}Test $test_count: $1${NC}"
-    echo "Command: $2"
-    eval $2
+    echo -e "${BLUE}[$test_count] $1${NC}"
+    echo "→ $2"
+    eval $2 2>/dev/null
     echo ""
-    sleep 1
+    sleep 0.5
 }
 
-echo "✅ Testing Working Endpoints (Should NOT generate errors)"
-echo "-----------------------------------------------------------"
-
-run_test "Health Check" "curl -s $BASE_URL/ | jq ."
-run_test "Get All Users" "curl -s $BASE_URL/api/users | jq ."
-run_test "Get Valid User" "curl -s $BASE_URL/api/users/1 | jq ."
-run_test "Valid Division" "curl -s '$BASE_URL/api/divide?a=10&b=2' | jq ."
-
+echo "=========================================="
+echo "CATEGORY 1: Normal Operations"
+echo "Expected: NO errors in Rootly"
+echo "=========================================="
 echo ""
-echo "❌ Testing Error Scenarios (SHOULD generate errors in Rootly)"
-echo "----------------------------------------------------------------"
 
-run_test "Null Reference Error - Invalid User ID" "curl -s $BASE_URL/api/users/999 | jq ."
+run_test "Health Check" "curl -s $BASE_URL/health | jq -r '.status'"
+run_test "Get All Users" "curl -s $BASE_URL/api/users | jq -r '.success'"
+run_test "Get User #1" "curl -s $BASE_URL/api/users/1 | jq -r '.user.name'"
+run_test "Calculate 10+2" "curl -s '$BASE_URL/api/calculate?a=10&b=2' | jq -r '.result'"
 
-run_test "Division by Zero" "curl -s '$BASE_URL/api/divide?a=10&b=0' | jq ."
+echo "=========================================="
+echo "CATEGORY 2: Automatic Error Capture"
+echo "Expected: 3 errors in Rootly"
+echo "=========================================="
+echo ""
 
-run_test "Type Error - Invalid Division Input" "curl -s '$BASE_URL/api/divide?a=abc&b=5' | jq ."
+run_test "Uncaught Exception" "curl -s $BASE_URL/test/uncaught-exception | jq -r '.message'"
+run_test "Unhandled Rejection" "curl -s $BASE_URL/test/unhandled-rejection | jq -r '.message'"
+run_test "Async Error" "curl -s $BASE_URL/test/async-error | jq -r '.error'"
 
-run_test "Async Error - Missing User ID" "curl -s $BASE_URL/api/async-task | jq ."
+echo "=========================================="
+echo "CATEGORY 3: Manual Error Capture"
+echo "Expected: 5 errors in Rootly"
+echo "=========================================="
+echo ""
 
-run_test "Async Error - Invalid User" "curl -s '$BASE_URL/api/async-task?userId=999' | jq ."
+run_test "Basic Manual Capture" "curl -s $BASE_URL/test/manual-capture | jq -r '.message'"
+run_test "Capture with Context" "curl -s '$BASE_URL/test/capture-with-context?userId=12345' | jq -r '.message'"
+run_test "Severity Levels (3 errors)" "curl -s $BASE_URL/test/severity-levels | jq -r '.message'"
 
-run_test "Database Query Error" "curl -s '$BASE_URL/api/db/query?table=users' | jq ."
+echo "=========================================="
+echo "CATEGORY 4: Express Middleware"
+echo "Expected: 1 error in Rootly (only 500)"
+echo "=========================================="
+echo ""
 
-run_test "Payment Error - Insufficient Funds" "curl -s -X POST $BASE_URL/api/payments -H 'Content-Type: application/json' -d '{\"userId\": 1, \"amount\": 5000}' | jq ."
+run_test "Express 500 Error (captured)" "curl -s $BASE_URL/test/express-500 | jq -r '.error'"
+run_test "Express 404 Error (NOT captured)" "curl -s $BASE_URL/test/express-404 | jq -r '.error'"
+run_test "Validation Error (NOT captured)" "curl -s -X POST $BASE_URL/test/express-validation | jq -r '.error'"
 
-run_test "Payment Error - Invalid User" "curl -s -X POST $BASE_URL/api/payments -H 'Content-Type: application/json' -d '{\"userId\": 999, \"amount\": 100, \"cardNumber\": \"1234567890123456\"}' | jq ."
+echo "=========================================="
+echo "CATEGORY 5: Function Wrapping"
+echo "Expected: 2 errors in Rootly"
+echo "=========================================="
+echo ""
 
-run_test "Order Error - Missing Items" "curl -s -X POST $BASE_URL/api/orders -H 'Content-Type: application/json' -d '{\"userId\": 1, \"total\": 100}' | jq ."
+run_test "Wrapped Sync Error" "curl -s '$BASE_URL/test/wrapped-sync?value=-5' | jq -r '.error'"
+run_test "Wrapped Sync Success" "curl -s '$BASE_URL/test/wrapped-sync?value=10' | jq -r '.result'"
+run_test "Wrapped Async Error" "curl -s $BASE_URL/test/wrapped-async | jq -r '.error'"
+run_test "Wrapped Async Success" "curl -s '$BASE_URL/test/wrapped-async?userId=1' | jq -r '.user.name'"
 
-run_test "Order Error - Invalid User" "curl -s -X POST $BASE_URL/api/orders -H 'Content-Type: application/json' -d '{\"userId\": 999, \"items\": [{\"name\": \"Product\"}], \"total\": 50}' | jq ."
+echo "=========================================="
+echo "CATEGORY 6: Serverless Simulation"
+echo "Expected: 1 error in Rootly"
+echo "=========================================="
+echo ""
 
-run_test "Unhandled Promise Rejection" "curl -s $BASE_URL/api/unhandled-promise | jq ."
+run_test "Serverless Success" "curl -s $BASE_URL/test/serverless-handler | jq -r '.message'"
+run_test "Serverless Error + Flush" "curl -s '$BASE_URL/test/serverless-handler?fail=true' | jq -r '.error'"
 
-run_test "JSON Parse Error" "curl -s '$BASE_URL/api/sync-error?config=invalid-json' | jq ."
+echo "=========================================="
+echo "CATEGORY 7: Edge Cases"
+echo "Expected: ~4-5 errors in Rootly"
+echo "=========================================="
+echo ""
+
+run_test "Null Reference Error" "curl -s '$BASE_URL/test/null-reference?userId=999' | jq -r '.error'"
+run_test "Type Error" "curl -s '$BASE_URL/test/type-error?a=hello&b=world' | jq -r '.error'"
+run_test "Database Timeout (random)" "curl -s $BASE_URL/test/database-timeout | jq -r '.error // .success'"
+run_test "Payment Error - Insufficient Funds" "curl -s -X POST $BASE_URL/test/payment-error -H 'Content-Type: application/json' -d '{\"userId\": 1, \"amount\": 5000}' | jq -r '.error'"
+run_test "Payment Error - Invalid User" "curl -s -X POST $BASE_URL/test/payment-error -H 'Content-Type: application/json' -d '{\"userId\": 999, \"amount\": 100, \"cardNumber\": \"1234567890123456\"}' | jq -r '.error'"
 
 echo ""
 echo "=========================================="
 echo "✅ Test Suite Complete!"
-echo "📊 Total Tests Run: $test_count"
+echo "=========================================="
+echo "Total Tests Run: $test_count"
 echo ""
-echo "🔍 Check your Rootly dashboard to verify all errors were captured!"
-echo "Expected: ~12 errors should appear in the dashboard"
+echo "📊 Expected Errors in Rootly Dashboard:"
+echo "  - Category 1: 0 errors (normal operations)"
+echo "  - Category 2: 3 errors (automatic capture)"
+echo "  - Category 3: 5 errors (manual capture)"
+echo "  - Category 4: 1 error (Express 500 only)"
+echo "  - Category 5: 2 errors (wrapped functions)"
+echo "  - Category 6: 1 error (serverless)"
+echo "  - Category 7: 4-5 errors (edge cases)"
+echo ""
+echo "Total Expected: ~16-17 errors"
+echo ""
+echo "🔍 Check your Rootly dashboard now!"
 echo "=========================================="

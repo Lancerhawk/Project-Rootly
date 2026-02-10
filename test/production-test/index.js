@@ -1,12 +1,12 @@
 require('dotenv').config();
 const express = require('express');
-const { init, capture, expressErrorHandler } = require('rootly-runtime');
+const { init, capture, wrap, expressErrorHandler, flush } = require('rootly-runtime');
 
-// Initialize Rootly SDK
+// Initialize Rootly SDK with all configuration options
 init({
     apiKey: process.env.ROOTLY_API_KEY,
-    environment: 'production',
-    debug: true
+    environment: process.env.NODE_ENV || 'production',
+    debug: true // Enable to see SDK logs
 });
 
 const app = express();
@@ -16,233 +16,460 @@ const PORT = process.env.PORT || 3000;
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// In-memory database simulation
+// In-memory data
 const users = [
     { id: 1, name: 'Alice', email: 'alice@example.com', balance: 1000 },
     { id: 2, name: 'Bob', email: 'bob@example.com', balance: 500 }
 ];
 
-const orders = [];
-
 // ============================================
-// NORMAL ENDPOINTS (Working correctly)
+// HOME - Test Categories
 // ============================================
-
-// Health check
 app.get('/', (req, res) => {
     res.json({
         status: 'ok',
-        message: 'Rootly Production Test App',
+        message: 'Rootly SDK Comprehensive Test Suite',
         version: '1.0.0',
-        endpoints: {
-            health: '/',
-            users: '/api/users',
-            user: '/api/users/:id',
-            createOrder: 'POST /api/orders',
-            processPayment: 'POST /api/payments',
-            divideNumbers: '/api/divide?a=10&b=2',
-            asyncOperation: '/api/async-task',
-            databaseQuery: '/api/db/query?table=users'
+        categories: {
+            'Normal Operations': {
+                description: 'Working endpoints that should NOT generate errors',
+                endpoints: [
+                    'GET /health',
+                    'GET /api/users',
+                    'GET /api/users/1',
+                    'GET /api/calculate?a=10&b=2'
+                ]
+            },
+            'Automatic Error Capture': {
+                description: 'Tests automatic capture of uncaught exceptions and unhandled rejections',
+                endpoints: [
+                    'GET /test/uncaught-exception',
+                    'GET /test/unhandled-rejection',
+                    'GET /test/async-error'
+                ]
+            },
+            'Manual Error Capture': {
+                description: 'Tests manual capture() with context and severity levels',
+                endpoints: [
+                    'GET /test/manual-capture',
+                    'GET /test/capture-with-context',
+                    'GET /test/severity-levels'
+                ]
+            },
+            'Express Middleware': {
+                description: 'Tests Express error handler middleware (5xx errors)',
+                endpoints: [
+                    'GET /test/express-500',
+                    'GET /test/express-404',
+                    'POST /test/express-validation'
+                ]
+            },
+            'Function Wrapping': {
+                description: 'Tests wrap() for automatic error capture',
+                endpoints: [
+                    'GET /test/wrapped-sync',
+                    'GET /test/wrapped-async'
+                ]
+            },
+            'Serverless Simulation': {
+                description: 'Tests flush() for serverless environments',
+                endpoints: [
+                    'GET /test/serverless-handler'
+                ]
+            },
+            'Edge Cases': {
+                description: 'Real-world error scenarios',
+                endpoints: [
+                    'GET /test/null-reference',
+                    'GET /test/type-error',
+                    'GET /test/database-timeout',
+                    'POST /test/payment-error'
+                ]
+            }
         }
     });
 });
 
-// Get all users
+// ============================================
+// CATEGORY 1: NORMAL OPERATIONS (No Errors)
+// ============================================
+
+app.get('/health', (req, res) => {
+    res.json({ status: 'healthy', timestamp: new Date().toISOString() });
+});
+
 app.get('/api/users', (req, res) => {
     res.json({ success: true, users });
 });
 
-// ============================================
-// ERROR SCENARIO 1: Null Reference Error
-// ============================================
 app.get('/api/users/:id', (req, res) => {
     const userId = parseInt(req.params.id);
     const user = users.find(u => u.id === userId);
 
-    // BUG: Not checking if user exists before accessing properties
-    // This will throw "Cannot read property 'name' of undefined"
-    const userName = user.name.toUpperCase();
+    if (!user) {
+        return res.status(404).json({ error: 'User not found' });
+    }
 
-    res.json({ success: true, user: userName });
+    res.json({ success: true, user });
 });
 
-// ============================================
-// ERROR SCENARIO 2: Division by Zero / Type Error
-// ============================================
-app.get('/api/divide', (req, res) => {
+app.get('/api/calculate', (req, res) => {
     const a = parseFloat(req.query.a);
     const b = parseFloat(req.query.b);
 
-    // BUG: Not validating input or checking for division by zero
-    // Can throw errors if a or b are not numbers
-    const result = a / b;
+    if (isNaN(a) || isNaN(b)) {
+        return res.status(400).json({ error: 'Invalid numbers' });
+    }
 
-    // BUG: Trying to call method on potentially Infinity/NaN
-    const formatted = result.toFixed(2);
-
-    res.json({ success: true, result: formatted });
+    res.json({
+        success: true,
+        result: a + b,
+        operation: 'addition'
+    });
 });
 
 // ============================================
-// ERROR SCENARIO 3: Async Promise Rejection
+// CATEGORY 2: AUTOMATIC ERROR CAPTURE
 // ============================================
-app.get('/api/async-task', async (req, res) => {
+
+// Test 1: Uncaught Exception
+app.get('/test/uncaught-exception', (req, res) => {
+    // This will be caught by SDK's uncaughtException handler
+    setTimeout(() => {
+        throw new Error('Uncaught exception test - This should appear in Rootly');
+    }, 100);
+
+    res.json({ message: 'Exception will be thrown asynchronously' });
+});
+
+// Test 2: Unhandled Promise Rejection
+app.get('/test/unhandled-rejection', (req, res) => {
+    // This will be caught by SDK's unhandledRejection handler
+    Promise.reject(new Error('Unhandled promise rejection test - This should appear in Rootly'));
+
+    res.json({ message: 'Promise rejection triggered' });
+});
+
+// Test 3: Async Function Error (not caught)
+app.get('/test/async-error', async (req, res) => {
+    // Intentionally not using try/catch
+    await failingAsyncOperation();
+    res.json({ message: 'This will never be reached' });
+});
+
+async function failingAsyncOperation() {
+    throw new Error('Async operation failed - This should appear in Rootly');
+}
+
+// ============================================
+// CATEGORY 3: MANUAL ERROR CAPTURE
+// ============================================
+
+// Test 4: Basic Manual Capture
+app.get('/test/manual-capture', async (req, res) => {
     try {
-        // Simulate async operation that might fail
-        const data = await fetchExternalData(req.query.userId);
-        res.json({ success: true, data });
+        throw new Error('Manual capture test');
     } catch (error) {
-        // BUG: Catching but not properly handling
-        // Sometimes we forget to capture or respond
-        console.error('Async error:', error.message);
-        // Forgot to send response - will cause timeout
+        // Manually capture the error
+        await capture(error);
+        res.json({
+            message: 'Error captured manually',
+            note: 'Check Rootly dashboard for this error'
+        });
     }
 });
 
-async function fetchExternalData(userId) {
+// Test 5: Capture with Context
+app.get('/test/capture-with-context', async (req, res) => {
+    try {
+        const userId = req.query.userId || '12345';
+        throw new Error('Operation failed with context');
+    } catch (error) {
+        // Capture with additional context
+        await capture(error, {
+            user_id: req.query.userId || '12345',
+            action: 'test_operation',
+            endpoint: '/test/capture-with-context',
+            timestamp: new Date().toISOString(),
+            custom_data: {
+                browser: req.headers['user-agent'],
+                ip: req.ip
+            }
+        });
+
+        res.json({
+            message: 'Error captured with context',
+            note: 'Check Rootly dashboard - should include user_id, action, etc.'
+        });
+    }
+});
+
+// Test 6: Severity Levels
+app.get('/test/severity-levels', async (req, res) => {
+    try {
+        // Capture with different severity levels
+        await capture(
+            new Error('This is an ERROR level message'),
+            { test: 'severity_error' },
+            'error'
+        );
+
+        await capture(
+            new Error('This is a WARNING level message'),
+            { test: 'severity_warning' },
+            'warning'
+        );
+
+        await capture(
+            new Error('This is an INFO level message'),
+            { test: 'severity_info' },
+            'info'
+        );
+
+        res.json({
+            message: 'Three errors captured with different severity levels',
+            note: 'Check Rootly dashboard for error, warning, and info entries'
+        });
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+});
+
+// ============================================
+// CATEGORY 4: EXPRESS MIDDLEWARE
+// ============================================
+
+// Test 7: Express 5xx Error (Should be captured)
+app.get('/test/express-500', (req, res, next) => {
+    const error = new Error('Express 5xx error test');
+    error.status = 500;
+    next(error);
+});
+
+// Test 8: Express 4xx Error (Should NOT be captured)
+app.get('/test/express-404', (req, res, next) => {
+    const error = new Error('Resource not found');
+    error.status = 404;
+    next(error);
+});
+
+// Test 9: Validation Error (Should NOT be captured - 400)
+app.post('/test/express-validation', (req, res, next) => {
+    const error = new Error('Validation failed');
+    error.status = 400;
+    next(error);
+});
+
+// ============================================
+// CATEGORY 5: FUNCTION WRAPPING
+// ============================================
+
+// Wrapped synchronous function
+const wrappedSyncFunction = wrap((value) => {
+    if (value < 0) {
+        throw new Error('Wrapped sync function error - negative value not allowed');
+    }
+    return value * 2;
+});
+
+// Wrapped async function
+const wrappedAsyncFunction = wrap(async (userId) => {
+    if (!userId) {
+        throw new Error('Wrapped async function error - userId required');
+    }
+
+    // Simulate async operation
+    await new Promise(resolve => setTimeout(resolve, 100));
+
+    const user = users.find(u => u.id === parseInt(userId));
+    if (!user) {
+        throw new Error('Wrapped async function error - user not found');
+    }
+
+    return user;
+});
+
+// Test 10: Wrapped Sync Function
+app.get('/test/wrapped-sync', (req, res) => {
+    try {
+        const value = parseInt(req.query.value || '-5');
+        const result = wrappedSyncFunction(value);
+        res.json({ success: true, result });
+    } catch (error) {
+        res.status(400).json({
+            error: error.message,
+            note: 'Error was captured by wrap() and re-thrown'
+        });
+    }
+});
+
+// Test 11: Wrapped Async Function
+app.get('/test/wrapped-async', async (req, res) => {
+    try {
+        const userId = req.query.userId;
+        const user = await wrappedAsyncFunction(userId);
+        res.json({ success: true, user });
+    } catch (error) {
+        res.status(400).json({
+            error: error.message,
+            note: 'Error was captured by wrap() and re-thrown'
+        });
+    }
+});
+
+// ============================================
+// CATEGORY 6: SERVERLESS SIMULATION
+// ============================================
+
+// Test 12: Serverless Handler with flush()
+app.get('/test/serverless-handler', async (req, res) => {
+    try {
+        // Simulate serverless function
+        const shouldFail = req.query.fail === 'true';
+
+        if (shouldFail) {
+            throw new Error('Serverless function error');
+        }
+
+        res.json({
+            success: true,
+            message: 'Serverless function completed'
+        });
+    } catch (error) {
+        // Capture error and flush before response
+        await capture(error, {
+            function: 'serverless-handler',
+            cold_start: false
+        });
+
+        // Wait for error to be sent (important in serverless)
+        await flush(2000);
+
+        res.status(500).json({
+            error: error.message,
+            note: 'Error captured and flushed before response'
+        });
+    }
+});
+
+// ============================================
+// CATEGORY 7: EDGE CASES (Real-World Errors)
+// ============================================
+
+// Test 13: Null Reference Error
+app.get('/test/null-reference', (req, res, next) => {
+    try {
+        const userId = parseInt(req.query.userId || '999');
+        const user = users.find(u => u.id === userId);
+
+        // BUG: Not checking if user exists
+        const userName = user.name.toUpperCase();
+
+        res.json({ success: true, userName });
+    } catch (error) {
+        next(error);
+    }
+});
+
+// Test 14: Type Error
+app.get('/test/type-error', (req, res, next) => {
+    try {
+        const a = req.query.a;
+        const b = req.query.b;
+
+        // BUG: Not validating types
+        const result = a.toFixed(2) / b.toFixed(2);
+
+        res.json({ success: true, result });
+    } catch (error) {
+        next(error);
+    }
+});
+
+// Test 15: Database Timeout Simulation
+app.get('/test/database-timeout', async (req, res, next) => {
+    try {
+        const result = await simulateDatabaseQuery();
+        res.json({ success: true, result });
+    } catch (error) {
+        next(error);
+    }
+});
+
+async function simulateDatabaseQuery() {
     return new Promise((resolve, reject) => {
         setTimeout(() => {
-            if (!userId) {
-                // BUG: Rejecting with string instead of Error object
-                reject('User ID is required');
+            // Randomly fail to simulate timeout
+            if (Math.random() > 0.5) {
+                reject(new Error('Database connection timeout'));
+            } else {
+                resolve({ data: 'Success' });
             }
-
-            // BUG: Trying to access property of undefined
-            const user = users.find(u => u.id === parseInt(userId));
-            resolve({ name: user.name, email: user.email });
         }, 100);
     });
 }
 
-// ============================================
-// ERROR SCENARIO 4: Database Query Error
-// ============================================
-app.get('/api/db/query', (req, res) => {
-    const table = req.query.table;
+// Test 16: Payment Processing Error
+app.post('/test/payment-error', async (req, res, next) => {
+    try {
+        const { userId, amount, cardNumber } = req.body;
 
-    // BUG: SQL injection vulnerable + no error handling
-    const query = `SELECT * FROM ${table} WHERE active = 1`;
+        const user = users.find(u => u.id === userId);
 
-    // Simulate database query
-    executeQuery(query)
-        .then(results => res.json({ success: true, results }))
-        .catch(err => {
-            // BUG: Throwing error in promise catch
-            throw new Error(`Database query failed: ${err.message}`);
+        // BUG: Not checking if user exists
+        if (user.balance < amount) {
+            throw new Error(`Insufficient funds. Required: ${amount}, Available: ${user.balance}`);
+        }
+
+        // BUG: Not validating cardNumber
+        const lastFour = cardNumber.slice(-4);
+
+        user.balance -= amount;
+
+        res.json({
+            success: true,
+            message: 'Payment processed',
+            lastFour,
+            newBalance: user.balance
         });
-});
-
-function executeQuery(query) {
-    return new Promise((resolve, reject) => {
-        setTimeout(() => {
-            // Simulate random database failures
-            if (Math.random() > 0.7) {
-                reject(new Error('Connection timeout'));
-            }
-
-            // BUG: Accessing undefined property
-            const results = query.results.map(r => r.id);
-            resolve(results);
-        }, 50);
-    });
-}
-
-// ============================================
-// ERROR SCENARIO 5: Payment Processing Error
-// ============================================
-app.post('/api/payments', express.json(), (req, res) => {
-    const { userId, amount, cardNumber } = req.body;
-
-    // BUG: Not validating required fields
-    const user = users.find(u => u.id === userId);
-
-    // BUG: Type coercion issues
-    if (user.balance < amount) {
-        throw new Error('Insufficient funds');
+    } catch (error) {
+        next(error);
     }
-
-    // BUG: Accessing property of potentially undefined
-    const lastFourDigits = cardNumber.slice(-4);
-
-    // Process payment
-    user.balance -= amount;
-
-    res.json({
-        success: true,
-        message: 'Payment processed',
-        newBalance: user.balance
-    });
 });
 
 // ============================================
-// ERROR SCENARIO 6: Order Creation with Validation
+// ERROR HANDLERS
 // ============================================
-app.post('/api/orders', express.json(), (req, res) => {
-    const { userId, items, total } = req.body;
 
-    // BUG: Assuming items is always an array
-    const itemCount = items.length;
-
-    // BUG: Not checking if user exists
-    const user = users.find(u => u.id === userId);
-
-    // BUG: Potential type mismatch
-    if (total > user.balance) {
-        // This will throw if user is undefined
-        throw new Error(`Insufficient balance. Required: ${total}, Available: ${user.balance}`);
-    }
-
-    // BUG: Array method on potentially undefined
-    const itemNames = items.map(item => item.name.toUpperCase());
-
-    const order = {
-        id: orders.length + 1,
-        userId,
-        items: itemNames,
-        total,
-        status: 'pending'
-    };
-
-    orders.push(order);
-
-    res.json({ success: true, order });
-});
-
-// ============================================
-// ERROR SCENARIO 7: Unhandled Rejection
-// ============================================
-app.get('/api/unhandled-promise', (req, res) => {
-    // BUG: Promise rejection without catch
-    Promise.reject(new Error('Unhandled promise rejection in endpoint'));
-
-    res.json({ success: true, message: 'Request sent' });
-});
-
-// ============================================
-// ERROR SCENARIO 8: Synchronous Exception
-// ============================================
-app.get('/api/sync-error', (req, res) => {
-    // BUG: Intentional synchronous error
-    const config = JSON.parse(req.query.config);
-
-    res.json({ success: true, config });
-});
-
-// Add Rootly error handler BEFORE final error handler
+// Add Rootly Express error handler BEFORE final error handler
 app.use(expressErrorHandler());
 
 // Final error handler
 app.use((err, req, res, next) => {
-    console.error('❌ Error caught by Express:', err.message);
-    res.status(err.status || 500).json({
+    console.error('Error:', err.message);
+
+    const statusCode = err.status || 500;
+
+    res.status(statusCode).json({
         error: err.message,
-        status: err.status || 500
+        status: statusCode,
+        path: req.path,
+        timestamp: new Date().toISOString()
     });
 });
 
-// Start server
+// ============================================
+// START SERVER
+// ============================================
+
 app.listen(PORT, () => {
-    console.log(`✅ Production Test App running on port ${PORT}`);
-    console.log(`🔍 Rootly SDK initialized with debug mode`);
-    console.log(`📍 Visit http://localhost:${PORT} for available endpoints`);
+    console.log('='.repeat(60));
+    console.log('Rootly SDK Comprehensive Test Suite');
+    console.log('='.repeat(60));
+    console.log(`Server running on port ${PORT}`);
+    console.log(`Environment: ${process.env.NODE_ENV || 'production'}`);
+    console.log(`Debug mode: enabled`);
+    console.log('');
+    console.log(`Visit http://localhost:${PORT} for test categories`);
+    console.log('='.repeat(60));
 });
