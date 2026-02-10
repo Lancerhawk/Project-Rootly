@@ -93,9 +93,17 @@ export function expressErrorHandler() {
         try {
             if (!apiKey) return next(err);
 
-            // Check error status code (err.status or err.statusCode) OR response status code
-            // This handles both cases: errors with status set, and already-sent responses
-            const statusCode = err.status || err.statusCode || res.statusCode || 500;
+            // Determine status code:
+            // 1. Check err.status or err.statusCode (explicitly set on error object)
+            // 2. Check res.statusCode ONLY if it's already 5xx (response already sent)
+            // 3. Default to 500 (assume server error if no status set)
+            let statusCode = err.status || err.statusCode;
+            if (!statusCode && res.statusCode >= 500) {
+                statusCode = res.statusCode;
+            }
+            if (!statusCode) {
+                statusCode = 500; // Default to server error
+            }
 
             // Only capture 5xx errors (server errors), not 4xx (client errors)
             if (statusCode >= 500) {

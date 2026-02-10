@@ -14,12 +14,27 @@ import githubRoutes from './routes/github';
 import projectRoutes from './routes/projects';
 import ingestRoutes from './routes/ingest';
 import incidentsRoutes from './routes/incidents';
+import testRoutes from './routes/test';
 
 // Import middleware
 import { errorHandler } from './middleware/errorHandler';
 
 // Load environment variables
 dotenv.config();
+
+// Initialize Rootly SDK to track our own errors
+import { init } from 'rootly-runtime';
+
+if (process.env.ROOTLY_API_KEY) {
+    init({
+        apiKey: process.env.ROOTLY_API_KEY,
+        environment: process.env.NODE_ENV === 'production' ? 'production' : 'preview',
+        debug: process.env.NODE_ENV !== 'production'
+    });
+    console.log('✅Rootly SDK initialized');
+} else {
+    console.warn('ROOTLY_API_KEY not set - error tracking disabled');
+}
 
 const app = express();
 const prisma = new PrismaClient();
@@ -145,6 +160,7 @@ app.use('/api/github', githubRoutes);
 app.use('/api/projects', projectRoutes);
 app.use('/api/incidents', incidentsRoutes); // JWT authenticated
 app.use('/api/ingest', ingestRoutes); // API key authenticated
+app.use('/api/test', testRoutes); // SDK testing endpoints
 
 // Health check
 app.get('/health', (req, res) => {

@@ -1,7 +1,10 @@
 import { Request, Response, NextFunction } from 'express';
+import { expressErrorHandler } from 'rootly-runtime';
 
 /**
  * Global error handler middleware
+ * Uses Rootly SDK to capture Express errors (5xx only)
+ * Then sends HTTP response to client
  */
 export function errorHandler(
     err: Error,
@@ -11,15 +14,20 @@ export function errorHandler(
 ) {
     console.error('Error:', err);
 
-    // Don't expose internal errors in production
-    const message = process.env.NODE_ENV === 'production'
-        ? 'Internal server error'
-        : err.message;
+    // Use Rootly Express middleware to capture the error
+    const rootlyMiddleware = expressErrorHandler();
 
-    res.status(500).json({
-        error: {
-            code: 'INTERNAL_ERROR',
-            message,
-        },
+    // Call Rootly middleware, then send response
+    rootlyMiddleware(err, req, res, () => {
+        const message = process.env.NODE_ENV === 'production'
+            ? 'Internal server error'
+            : err.message;
+
+        res.status(500).json({
+            error: {
+                code: 'INTERNAL_ERROR',
+                message,
+            },
+        });
     });
 }

@@ -7,6 +7,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [1.2.7] - 2026-02-10
+
+### Fixed
+
+- **Express Error Handler Status Code Detection**
+  - Fixed bug where `res.statusCode` (default 200) was checked before the `|| 500` fallback
+  - Now properly defaults to 500 for errors without explicit status codes
+  - Only uses `res.statusCode` if it's already 5xx (response already sent)
+  - Ensures all Express errors are captured, not just those with explicit status codes
+
+---
+
 ## [1.2.3] - 2026-02-09
 
 ### 🐛 Bug Fix Release

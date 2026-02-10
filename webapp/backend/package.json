@@ -24,7 +24,7 @@
     "express-session": "^1.18.1",
     "passport": "^0.7.0",
     "passport-github2": "^0.1.12",
-    "rootly-runtime": "^1.2.0"
+    "rootly-runtime": "^1.2.7"
   },
   "devDependencies": {
     "@types/bcrypt": "^5.0.2",
