@@ -294,36 +294,84 @@ sequenceDiagram
 
 ```
 Project-Rootly/
+├── runtime-sdk/              # Node.js SDK for error capture
+│   ├── src/
+│   │   ├── index.ts         # Main SDK exports
+│   │   ├── runtime.ts       # Core error capture logic
+│   │   ├── context.ts       # Environment context detection
+│   │   └── transport.ts     # HTTP transport layer
+│   ├── dist/                # Compiled JavaScript
+│   ├── package.json         # Published as rootly-runtime
+│   ├── CHANGELOG.md
+│   └── README.md
+│
+├── ide-extension/           # VS Code extension
+│   ├── src/
+│   │   ├── extension.ts     # Extension entry point
+│   │   ├── auth.ts          # GitHub OAuth flow
+│   │   ├── api.ts           # Backend API client
+│   │   ├── poller.ts        # 45-second incident polling
+│   │   ├── state.ts         # Extension state management
+│   │   ├── repoDetection.ts # Git repository detection
+│   │   └── views/
+│   │       └── incidentsTree.ts  # Sidebar tree view
+│   ├── resources/           # Extension icons
+│   ├── out/                 # Compiled JavaScript
+│   ├── package.json         # VS Code extension manifest
+│   ├── CHANGELOG.md
+│   └── README.md
+│
 ├── webapp/
-│   ├── frontend/              # Next.js 15 application
+│   ├── frontend/            # Next.js 15 application
 │   │   ├── app/
-│   │   │   ├── components/    # React components
-│   │   │   ├── dashboard/     # Dashboard page
-│   │   │   ├── projects/      # Project management
-│   │   │   ├── layout.tsx     # Root layout
-│   │   │   └── page.tsx       # Landing page
+│   │   │   ├── components/  # React components
+│   │   │   ├── dashboard/   # Dashboard page
+│   │   │   ├── projects/    # Project management
+│   │   │   ├── docs/        # Documentation page
+│   │   │   ├── layout.tsx   # Root layout
+│   │   │   └── page.tsx     # Landing page
 │   │   ├── public/
 │   │   │   └── versions.json  # Version history
 │   │   └── package.json
 │   │
-│   └── backend/               # Express.js API
-│       ├── src/
-│       │   ├── routes/        # API routes
-│       │   │   ├── auth.ts    # Authentication
-│       │   │   └── projects.ts # Project management
-│       │   ├── services/      # Business logic
-│       │   │   └── keys.ts    # API key generation
-│       │   └── index.ts       # Server entry point
-│       ├── prisma/
-│       │   └── schema.prisma  # Database schema
-│       └── package.json
+│   ├── backend/             # Express.js API
+│   │   ├── src/
+│   │   │   ├── routes/
+│   │   │   │   ├── auth.ts      # User authentication
+│   │   │   │   ├── oauth.ts     # GitHub OAuth callback
+│   │   │   │   ├── projects.ts  # Project management
+│   │   │   │   ├── ingest.ts    # Error ingestion endpoint
+│   │   │   │   └── incidents.ts # Incidents read API
+│   │   │   ├── services/
+│   │   │   │   └── keys.ts      # API key generation
+│   │   │   └── index.ts         # Server entry point
+│   │   ├── prisma/
+│   │   │   ├── schema.prisma    # Database schema
+│   │   │   └── migrations/      # Database migrations
+│   │   └── package.json
+│   ├── CHANGELOG.md
+│   └── README.md
 │
-├── docs/                      # Documentation
-│   ├── backend-api.md
-│   ├── database-schema.md
-│   └── edge-cases.md
+├── test/
+│   └── production-test/     # Comprehensive SDK test suite
+│       ├── index.js         # Express app with all error scenarios
+│       ├── test-errors.ps1  # PowerShell test script
+│       ├── test-errors.sh   # Bash test script
+│       ├── package.json
+│       └── README.md        # Test documentation
 │
-└── README.md                  # This file
+├── docs/                    # Technical documentation
+│   ├── architecture.md      # System architecture
+│   ├── backend-api.md       # API documentation
+│   ├── database-schema.md   # Database design
+│   ├── edge-cases.md        # Edge case handling
+│   ├── ide-extension-design.md  # Extension architecture
+│   ├── incidents-api-testing.md # API testing guide
+│   └── sdk-design.md        # SDK architecture
+│
+├── CHANGELOG.md             # Project-wide changelog
+├── LICENSE
+└── README.md                # This file
 ```
 
 ---
