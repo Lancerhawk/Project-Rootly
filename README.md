@@ -6,20 +6,6 @@ Rootly is a developer platform designed to bridge the gap between production fai
 
 ---
 
-## 📋 Table of Contents
-
-- [Overview](#overview)
-- [Key Features](#key-features)
-- [Architecture](#architecture)
-- [Workflow](#workflow)
-- [Technology Stack](#technology-stack)
-- [Project Structure](#project-structure)
-- [Getting Started](#getting-started)
-- [Roadmap](#roadmap)
-- [Contributing](#contributing)
-
----
-
 ## 🎯 Overview
 
 Rootly transforms how developers handle production errors by bringing them directly into the IDE. Instead of switching between monitoring dashboards and code editors, developers receive inline notifications about production failures with complete context, making debugging faster and more efficient.

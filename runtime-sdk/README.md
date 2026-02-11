@@ -333,7 +333,7 @@ MIT
 
 For issues and questions:
 - GitHub: https://github.com/Lancerhawk/Project-Rootly
-- Documentation: https://rootly-webapp.vercel.app/docs
+- Documentation: https://project-rootly.vercel.app/docs
 
 ## Changelog
 
