@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import Image from 'next/image';
 
 interface Feature {
     title: string;
@@ -74,7 +75,7 @@ export default function VersionButton() {
                         {/* Header */}
                         <div className="flex items-start justify-between p-8 border-b border-zinc-800 flex-shrink-0">
                             <div className="flex items-center gap-4">
-                                <img src="/icon.svg" alt="Rootly" className="w-12 h-12" />
+                                <Image src="/icon.svg" alt="Rootly" width={48} height={48} className="w-12 h-12" />
                                 <div>
                                     <h3 className="text-2xl font-bold text-white">Rootly</h3>
                                     <p className="text-sm text-indigo-400 font-semibold">Version {versionData.currentVersion}</p>

@@ -1,12 +1,10 @@
-# 🚀 Rootly
+# Rootly
 
 **Surface Production Errors Directly in Your IDE**
 
 Rootly is a developer platform designed to bridge the gap between production failures and your development environment. Get real-time notifications about production errors right where you code, with full context and stack traces.
 
----
-
-## 🎯 Overview
+## Overview
 
 Rootly transforms how developers handle production errors by bringing them directly into the IDE. Instead of switching between monitoring dashboards and code editors, developers receive inline notifications about production failures with complete context, making debugging faster and more efficient.
 
@@ -25,74 +23,70 @@ Rootly provides:
 - **Full Context**: Complete stack traces, user data, and environment info
 - **Quick Resolution**: Jump directly to the problematic code with one click
 
----
-
-## ✨ Key Features
+## Key Features
 
 ### Current (v1.2.2 - SDK and IDE Extension Fixes)
 
-- ✅ **SDK v1.2.6** - Fixed Express middleware to properly detect 5xx errors
-- ✅ **SDK v1.2.5** - Added commit SHA fallback for local development
-- ✅ **IDE Extension v1.1.2** - Fixed file path resolution for Windows absolute paths
-- ✅ **IDE Extension v1.1.1** - Stack trace parsing handles paths with spaces
-- ✅ **Production Stability** - All critical error capture bugs resolved
+- SDK v1.2.6 - Fixed Express middleware to properly detect 5xx errors
+- SDK v1.2.5 - Added commit SHA fallback for local development
+- IDE Extension v1.1.2 - Fixed file path resolution for Windows absolute paths
+- IDE Extension v1.1.1 - Stack trace parsing handles paths with spaces
+- Production Stability - All critical error capture bugs resolved
 
 ### Previously Implemented (v1.2.0 - Runtime SDK Production Hardening)
 
-- ✅ **Production-Ready SDK** - rootly-runtime v1.2.0 with 283 lines of hardened code
-- ✅ **Severity Support** - Capture errors with error, warning, info levels
-- ✅ **Environment Normalization** - Automatic production/preview normalization with NODE_ENV fallback
-- ✅ **Debug Mode** - Optional stderr logging for SDK visibility
-- ✅ **Recursive Protection** - Symbol flag prevents infinite loops
-- ✅ **Stable Fingerprinting** - Improved deduplication with normalized whitespace
-- ✅ **Hard Memory Cap** - Max 500 fingerprints with auto-cleanup
-- ✅ **Optimized Rate Limiter** - O(n) performance
-- ✅ **Clean Public API** - Removed apiUrl from InitOptions (use ROOTLY_API_URL env var)
-- ✅ **Critical Bug Fixes** - Environment fallback, listener guards, transport counter
+- Production-Ready SDK - rootly-runtime v1.2.0 with 283 lines of hardened code
+- Severity Support - Capture errors with error, warning, info levels
+- Environment Normalization - Automatic production/preview normalization with NODE_ENV fallback
+- Debug Mode - Optional stderr logging for SDK visibility
+- Recursive Protection - Symbol flag prevents infinite loops
+- Stable Fingerprinting - Improved deduplication with normalized whitespace
+- Hard Memory Cap - Max 500 fingerprints with auto-cleanup
+- Optimized Rate Limiter - O(n) performance
+- Clean Public API - Removed apiUrl from InitOptions (use ROOTLY_API_URL env var)
+- Critical Bug Fixes - Environment fallback, listener guards, transport counter
 
 ### Previously Implemented (v1.1.0 - IDE Extension Release)
 
-- ✅ **Go to Error Location** - One-click navigation to exact file and line where errors occurred
-- ✅ **Expandable Incident Cards** - Click incidents to see environment, timestamps, and commit SHA
-- ✅ **New Incident Notifications** - Desktop alerts when new incidents are detected
-- ✅ **Manual Refresh** - Rate-limited refresh button (5 per 2 minutes)
-- ✅ **Professional UI Redesign** - Clean, minimal interface with VS Code native icons
-- ✅ **Enhanced OAuth Flow** - Minimal, professional IDE authentication page
+- Go to Error Location - One-click navigation to exact file and line where errors occurred
+- Expandable Incident Cards - Click incidents to see environment, timestamps, and commit SHA
+- New Incident Notifications - Desktop alerts when new incidents are detected
+- Manual Refresh - Rate-limited refresh button (5 per 2 minutes)
+- Professional UI Redesign - Clean, minimal interface with VS Code native icons
+- Enhanced OAuth Flow - Minimal, professional IDE authentication page
 
 ### Previously Implemented (v1.0.3)
 
-- ✅ **Cross-Site Cookie Support** - SameSite=None for cross-domain auth
-- ✅ **Session Race Condition Fix** - Explicit session saving before redirect
-- ✅ **Route Architecture Cleanup** - Separated OAuth and API routes
-- ✅ **Security Hardening** - Removed token exposure from API responses
-- ✅ **Proxy Trust Configuration** - Support for reverse proxy deployments
+- Cross-Site Cookie Support - SameSite=None for cross-domain auth
+- Session Race Condition Fix - Explicit session saving before redirect
+- Route Architecture Cleanup - Separated OAuth and API routes
+- Security Hardening - Removed token exposure from API responses
+- Proxy Trust Configuration - Support for reverse proxy deployments
 
 ### Previously Implemented (v1.0.2)
 
-- ✅ **Hardened Ingest Endpoint** - POST /api/ingest with strict validation
-- ✅ **Commit SHA Validation** - Enforces 40-char lowercase hex Git SHAs
-- ✅ **Enhanced Data Capture** - Stack traces, error types, environment, timestamps
-- ✅ **Incidents Read API** - GET /api/incidents with JWT auth and filtering
-- ✅ **Comprehensive Documentation** - Testing guides and migration docs
+- Hardened Ingest Endpoint - POST /api/ingest with strict validation
+- Commit SHA Validation - Enforces 40-char lowercase hex Git SHAs
+- Enhanced Data Capture - Stack traces, error types, environment, timestamps
+- Incidents Read API - GET /api/incidents with JWT auth and filtering
+- Comprehensive Documentation - Testing guides and migration docs
 
 ### Previously Implemented (v1.0.1)
 
-- ✅ **GitHub OAuth Authentication** - Secure login with GitHub
-- ✅ **Project Management** - Create and manage multiple projects
-- ✅ **API Key Generation** - Secure keys for SDK integration
-- ✅ **User Dashboard** - Overview of all your projects
-- ✅ **Premium UI** - Modern, responsive dark-themed interface
+- GitHub OAuth Authentication - Secure login with GitHub
+- Project Management - Create and manage multiple projects
+- API Key Generation - Secure keys for SDK integration
+- User Dashboard - Overview of all your projects
+- Premium UI - Modern, responsive dark-themed interface
 
 ### Coming Soon
 
-- 🔄 **Node.js SDK** (v0.2.0) - Error tracking library for Node.js apps
-- 🔄 **Error Dashboard** (v0.4.0) - Real-time monitoring and analytics
-- 🔄 **Team Collaboration** - Share and assign errors to team members
-- 🔄 **Source Maps** - Accurate stack traces for production code
+- **Node.js SDK** (v0.2.0) - Error tracking library for Node.js apps
+- **Error Dashboard** (v0.4.0) - Real-time monitoring and analytics
+- **Team Collaboration** - Share and assign errors to team members
+- **Source Maps** - Accurate stack traces for production code
 
----
-
-## 🏗️ Architecture
+## Architecture
 
 ### High-Level Architecture
 
@@ -179,9 +173,7 @@ graph LR
     style Database fill:#EF4444
 ```
 
----
-
-## 🔄 Workflow
+## Workflow
 
 ### User Onboarding & Project Setup
 
@@ -246,9 +238,7 @@ sequenceDiagram
     Dev->>App: Fix the bug
 ```
 
----
-
-## 🛠️ Technology Stack
+## Technology Stack
 
 ### Frontend
 - **Framework**: Next.js 15 (App Router)
@@ -274,9 +264,7 @@ sequenceDiagram
 - **Package Manager**: npm
 - **Development**: tsx (TypeScript execution)
 
----
-
-## 📁 Project Structure
+## Project Structure
 
 ```
 Project-Rootly/
@@ -360,9 +348,7 @@ Project-Rootly/
 └── README.md                # This file
 ```
 
----
-
-## 🚀 Getting Started
+## Getting Started
 
 ### Prerequisites
 
@@ -493,49 +479,45 @@ The frontend will start on `http://localhost:3000`
 3. Create your first project
 4. Copy the API key (it's shown only once!)
 
----
+## Roadmap
 
-## 🗺️ Roadmap
+### Phase 1: Web App Foundation (v1.0.0) - Completed
+- GitHub OAuth authentication
+- Project management
+- API key generation
+- User dashboard
+- Premium UI design
 
-### Phase 1: Web App Foundation ✅ (v1.0.0)
-- [x] GitHub OAuth authentication
-- [x] Project management
-- [x] API key generation
-- [x] User dashboard
-- [x] Premium UI design
+### Phase 2: Production-Ready Error Ingestion (v1.0.2) - Completed
+- Hardened ingest endpoint (POST /api/ingest)
+- Strict validation (commit SHA, environment, timestamps)
+- Enhanced data capture (stack traces, error types)
+- Incidents read API (GET /api/incidents)
+- Comprehensive documentation
 
-### Phase 2: Production-Ready Error Ingestion ✅ (Current - v1.0.2)
-- [x] Hardened ingest endpoint (POST /api/ingest)
-- [x] Strict validation (commit SHA, environment, timestamps)
-- [x] Enhanced data capture (stack traces, error types)
-- [x] Incidents read API (GET /api/incidents)
-- [x] Comprehensive documentation
+### Phase 3: Node.js SDK (v0.2.0) - In Progress
+- Error capture and serialization
+- Stack trace parsing
+- Source map support
+- Context collection
+- API integration
 
-### Phase 3: Node.js SDK 🔄 (v0.2.0)
-- [ ] Error capture and serialization
-- [ ] Stack trace parsing
-- [ ] Source map support
-- [ ] Context collection
-- [ ] API integration
+### Phase 4: VS Code Extension (v1.1.0) - Completed
+- Real-time error notifications
+- Expandable incident cards
+- Jump to error location with stack trace parsing
+- GitHub repository sync
+- Professional UI with native icons
+- Manual refresh with rate limiting
 
-### Phase 4: VS Code Extension ✅ (v1.1.0 - Completed)
-- [x] Real-time error notifications
-- [x] Expandable incident cards
-- [x] Jump to error location with stack trace parsing
-- [x] GitHub repository sync
-- [x] Professional UI with native icons
-- [x] Manual refresh with rate limiting
+### Phase 5: Error Dashboard (v0.4.0) - Planned
+- Error analytics and charts
+- Error grouping and deduplication
+- Source code viewer
+- Team collaboration features
+- Error assignment and tracking
 
-### Phase 5: Error Dashboard 🔄 (v0.4.0)
-- [ ] Error analytics and charts
-- [ ] Error grouping and deduplication
-- [ ] Source code viewer
-- [ ] Team collaboration features
-- [ ] Error assignment and tracking
-
----
-
-## 🤝 Contributing
+## Contributing
 
 We welcome contributions! Here's how you can help:
 
@@ -553,22 +535,16 @@ We welcome contributions! Here's how you can help:
 - Update documentation as needed
 - Keep PRs focused and small
 
----
-
-## 📄 License
+## License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
----
-
-## 📧 Contact
+## Contact
 
 - **GitHub**: [@Lancerhawk](https://github.com/Lancerhawk)
 - **Project Repository**: [Project-Rootly](https://github.com/Lancerhawk/Project-Rootly)
 
----
-
-## 🙏 Acknowledgments
+## Acknowledgments
 
 Built with modern web technologies and a passion for improving developer experience.
 
@@ -577,5 +553,5 @@ Built with modern web technologies and a passion for improving developer experie
 ---
 
 <div align="center">
-  <strong>Made with ⚡ by developers, for developers</strong>
+  <strong>Made by developer, for developers</strong>
 </div>

@@ -2,6 +2,7 @@
 
 import { useEffect, useState, useRef } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 
 interface User {
@@ -87,16 +88,16 @@ export default function Navbar() {
             <div className="max-w-7xl mx-auto px-6 lg:px-8">
                 <div className="flex justify-between items-center h-20">
                     <Link href="/" className="flex items-center gap-3">
-                        <img src="/icon.svg" alt="Rootly" className="w-10 h-10" />
+                        <Image src="/icon.svg" alt="Rootly" width={40} height={40} className="w-10 h-10" />
                         <span className="text-xl font-semibold">Rootly</span>
                     </Link>
                     <div className="flex items-center gap-8">
-                        <a href="/#features" className="hidden md:block text-zinc-400 hover:text-white transition-colors">
+                        <Link href="/#features" className="hidden md:block text-zinc-400 hover:text-white transition-colors">
                             Features
-                        </a>
-                        <a href="/#how-it-works" className="hidden md:block text-zinc-400 hover:text-white transition-colors">
+                        </Link>
+                        <Link href="/#how-it-works" className="hidden md:block text-zinc-400 hover:text-white transition-colors">
                             How it Works
-                        </a>
+                        </Link>
                         <Link href="/docs" className="hidden md:block text-zinc-400 hover:text-white transition-colors">
                             Docs
                         </Link>
@@ -107,9 +108,11 @@ export default function Navbar() {
                                     className="flex items-center gap-3 hover:opacity-80 transition-opacity"
                                 >
                                     {user.avatarUrl && (
-                                        <img
+                                        <Image
                                             src={user.avatarUrl}
                                             alt={user.githubUsername}
+                                            width={36}
+                                            height={36}
                                             className="w-9 h-9 rounded-full border-2 border-zinc-800"
                                         />
                                     )}

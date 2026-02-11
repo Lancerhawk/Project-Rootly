@@ -141,7 +141,7 @@ export default function NewProjectPage() {
                                 <div>
                                     <h3 className="font-semibold text-amber-500 mb-1">Important: Save These Credentials</h3>
                                     <p className="text-sm text-amber-200/80">
-                                        You won't be able to see the API key again after leaving this page. Make sure to copy and save it securely.
+                                        You won&apos;t be able to see the API key again after leaving this page. Make sure to copy and save it securely.
                                     </p>
                                 </div>
                             </div>
@@ -343,7 +343,7 @@ export default function NewProjectPage() {
                                     ⚠️ <strong>Beta Testing Phase</strong>
                                 </p>
                                 <p className="text-sm text-zinc-400">
-                                    Rootly is currently in active development. Some errors may not be captured reliably across all platforms. We're continuously improving error detection and capture mechanisms.
+                                    Rootly is currently in active development. Some errors may not be captured reliably across all platforms. We&apos;re continuously improving error detection and capture mechanisms.
                                 </p>
                             </div>
                         </div>

@@ -215,7 +215,7 @@ export default function HomePage() {
                                         <div className="w-2 h-2 bg-red-500 rounded-full mt-2 flex-shrink-0"></div>
                                         <div className="flex-1 min-w-0">
                                             <div className="text-xs text-zinc-500 mb-1">checkout.ts:42</div>
-                                            <div className="text-xs md:text-sm text-red-400 font-mono break-words">TypeError: Cannot read property 'id'</div>
+                                            <div className="text-xs md:text-sm text-red-400 font-mono break-words">TypeError: Cannot read property &apos;id&apos;</div>
                                         </div>
                                     </div>
                                 </div>

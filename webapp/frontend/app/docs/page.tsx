@@ -351,7 +351,7 @@ ROOTLY_API_KEY=your_api_key_here`}
                                     <div className="bg-black/30 rounded-lg p-4 border border-zinc-800">
                                         <h4 className="font-semibold mb-2 text-indigo-400">Jump to Code</h4>
                                         <p className="text-sm text-zinc-400">
-                                            Click "Go to Error Location" to open the exact file and line
+                                            Click &quot;Go to Error Location&quot; to open the exact file and line
                                         </p>
                                     </div>
                                     <div className="bg-black/30 rounded-lg p-4 border border-zinc-800">
@@ -879,7 +879,7 @@ const safeFunction = wrap(async (userId: string) => {
                                 <div>
                                     <h4 className="font-semibold mb-2 text-indigo-400">Data Isolation</h4>
                                     <p className="text-sm text-zinc-400">
-                                        Users can ONLY access data for projects they own. All queries are scoped to the authenticated user's projects.
+                                        Users can ONLY access data for projects they own. All queries are scoped to the authenticated user&apos;s projects.
                                     </p>
                                 </div>
                                 <div>

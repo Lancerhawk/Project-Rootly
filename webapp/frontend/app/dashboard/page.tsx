@@ -33,45 +33,45 @@ export default function DashboardPage() {
     const [deleting, setDeleting] = useState(false);
 
     useEffect(() => {
+        const fetchUser = async () => {
+            try {
+                const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/me`, {
+                    credentials: 'include',
+                });
+
+                if (!res.ok) {
+                    router.push('/');
+                    return;
+                }
+
+                const data = await res.json();
+                setUser(data);
+            } catch (error) {
+                console.error('Failed to fetch user:', error);
+                router.push('/');
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        const fetchProjects = async () => {
+            try {
+                const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/projects`, {
+                    credentials: 'include',
+                });
+
+                if (res.ok) {
+                    const data = await res.json();
+                    setProjects(data.projects);
+                }
+            } catch (error) {
+                console.error('Failed to fetch projects:', error);
+            }
+        };
+
         fetchUser();
         fetchProjects();
-    }, []);
-
-    const fetchUser = async () => {
-        try {
-            const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/me`, {
-                credentials: 'include',
-            });
-
-            if (!res.ok) {
-                router.push('/');
-                return;
-            }
-
-            const data = await res.json();
-            setUser(data);
-        } catch (error) {
-            console.error('Failed to fetch user:', error);
-            router.push('/');
-        } finally {
-            setLoading(false);
-        }
-    };
-
-    const fetchProjects = async () => {
-        try {
-            const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/projects`, {
-                credentials: 'include',
-            });
-
-            if (res.ok) {
-                const data = await res.json();
-                setProjects(data.projects);
-            }
-        } catch (error) {
-            console.error('Failed to fetch projects:', error);
-        }
-    };
+    }, [router]);
 
     const handleDeleteClick = (project: Project) => {
         setDeleteModal({ show: true, project });
