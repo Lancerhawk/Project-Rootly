@@ -6,6 +6,13 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 
+## [1.1.3] - 2026-02-15
+
+### Fixed
+- **Path Resolution**: "Go to Error" now correctly handles absolute paths from the same machine (no more "File not found" for local setups)
+- **Fuzzy Matching**: Improved workspace file search to correctly find files even if they are in `node_modules` when the path suggests it
+- **Code Duplication**: Refactored navigation logic to be consistent between command palette and sidebar clicks
+
 ## [1.1.2] - 2026-02-10
 
 ### Fixed

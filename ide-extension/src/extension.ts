@@ -98,21 +98,73 @@ export function activate(context: vscode.ExtensionContext) {
     // Register Go to Error command
     context.subscriptions.push(
         vscode.commands.registerCommand('rootly.goToError', async (filePath: string, line: number) => {
+            if (!filePath) {
+                vscode.window.showWarningMessage('No file path provided');
+                return;
+            }
+
+            // Helper to open document at line
+            const openDocumentAtLine = async (uri: vscode.Uri) => {
+                const document = await vscode.workspace.openTextDocument(uri);
+                const editor = await vscode.window.showTextDocument(document);
+
+                const lineIndex = Math.max(0, line - 1);
+                const position = new vscode.Position(lineIndex, 0);
+                editor.selection = new vscode.Selection(position, position);
+                editor.revealRange(new vscode.Range(position, position), vscode.TextEditorRevealType.InCenter);
+            };
+
+            // 1. Try absolute path directly
+            // Handles local development where path is valid on filesystem
+            try {
+                const uri = vscode.Uri.file(filePath);
+                await vscode.workspace.fs.stat(uri);
+                await openDocumentAtLine(uri);
+                return;
+            } catch (e) {
+                // File doesn't exist at absolute path, fall back to workspace search
+            }
+
+            // 2. Search in workspace (fuzzy match)
             const workspaceFolders = vscode.workspace.workspaceFolders;
             if (workspaceFolders && workspaceFolders.length > 0) {
-                // Extract just the filename from the full path (handles both Unix and Windows paths)
-                const fileName = filePath.split('/').pop() || filePath.split('\\').pop() || filePath;
+                // Extract filename handling both / and \ separators
+                const fileName = filePath.split(/[/\\]/).pop();
 
-                const files = await vscode.workspace.findFiles(`**/${fileName}`, '**/node_modules/**', 1);
+                if (!fileName) {
+                    vscode.window.showWarningMessage(`Invalid file path: ${filePath}`);
+                    return;
+                }
+
+                // If path suggests node_modules, don't exclude it
+                const isNodeModules = filePath.includes('node_modules');
+                const excludePattern = isNodeModules ? null : '**/node_modules/**';
+
+                const files = await vscode.workspace.findFiles(`**/${fileName}`, excludePattern, 10);
+
                 if (files.length > 0) {
-                    const document = await vscode.workspace.openTextDocument(files[0]);
-                    const editor = await vscode.window.showTextDocument(document);
+                    // If multiple files found, try to find the best match by path suffix
+                    // Normalize the input path for comparison
+                    const normalizedInputPath = filePath.replace(/\\/g, '/');
 
-                    // Jump to the line
-                    const lineIndex = Math.max(0, line - 1); // Convert to 0-based
-                    const position = new vscode.Position(lineIndex, 0);
-                    editor.selection = new vscode.Selection(position, position);
-                    editor.revealRange(new vscode.Range(position, position), vscode.TextEditorRevealType.InCenter);
+                    const bestMatch = files.reduce((best, current) => {
+                        const normalizedCurrent = current.fsPath.replace(/\\/g, '/');
+                        // Simple score: how many trailing characters match?
+                        // We iterate backwards
+                        let score = 0;
+                        const len = Math.min(normalizedInputPath.length, normalizedCurrent.length);
+                        for (let i = 1; i <= len; i++) {
+                            if (normalizedInputPath[normalizedInputPath.length - i] === normalizedCurrent[normalizedCurrent.length - i]) {
+                                score++;
+                            } else {
+                                break;
+                            }
+                        }
+
+                        return score > best.score ? { uri: current, score } : best;
+                    }, { uri: files[0], score: -1 });
+
+                    await openDocumentAtLine(bestMatch.uri);
                 } else {
                     vscode.window.showWarningMessage(`File not found in workspace: ${fileName}`);
                 }
@@ -516,28 +568,8 @@ function showIncidentDetails(incident: Incident) {
     panel.webview.onDidReceiveMessage(
         async message => {
             if (message.command === 'goToError') {
-                // Try to find and open the file
-                const workspaceFolders = vscode.workspace.workspaceFolders;
-                if (workspaceFolders && workspaceFolders.length > 0) {
-                    // Extract just the filename from the full path (handles both Unix and Windows paths)
-                    const fileName = message.file.split('/').pop() || message.file.split('\\').pop() || message.file;
-
-                    const files = await vscode.workspace.findFiles(`**/${fileName}`, '**/node_modules/**', 1);
-                    if (files.length > 0) {
-                        const document = await vscode.workspace.openTextDocument(files[0]);
-                        const editor = await vscode.window.showTextDocument(document);
-
-                        // Jump to the line
-                        const line = Math.max(0, message.line - 1); // Convert to 0-based
-                        const position = new vscode.Position(line, 0);
-                        editor.selection = new vscode.Selection(position, position);
-                        editor.revealRange(new vscode.Range(position, position), vscode.TextEditorRevealType.InCenter);
-                    } else {
-                        vscode.window.showWarningMessage(`File not found in workspace: ${fileName}`);
-                    }
-                } else {
-                    vscode.window.showWarningMessage('No workspace folder open');
-                }
+                // Delegate to the command handler
+                vscode.commands.executeCommand('rootly.goToError', message.file, message.line);
             }
         },
         undefined,
