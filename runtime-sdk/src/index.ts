@@ -11,7 +11,7 @@ interface InitOptions {
     debug?: boolean;
 }
 
-const DEFAULT_API_URL = 'https://3.111.33.111.nip.io';
+const DEFAULT_API_URL = '__ROOTLY_API_URL_PLACEHOLDER__';
 
 let isInitialized = false;
 let apiKey: string;
