@@ -527,7 +527,7 @@ function showIncidentDetails(incident: Incident) {
                 <div class="action-title">Jump to Error</div>
                 <div class="action-desc">Open the file where this error occurred</div>
                 <button class="button" onclick="goToError()">
-                    → Open ${firstFileLocation.file}:${firstFileLocation.line}
+                    → Open ${firstFileLocation.file.split(/[/\\]/).pop()}:${firstFileLocation.line}
                 </button>
             </div>
             ` : ''}

@@ -63,7 +63,7 @@ export class IncidentsTreeProvider implements vscode.TreeDataProvider<IncidentTr
                 children.push(
                     new IncidentTreeItem(
                         'Go to Error Location',
-                        `${firstFileLocation.file}:${firstFileLocation.line}`,
+                        `${firstFileLocation.file.split(/[/\\]/).pop()}:${firstFileLocation.line}`,
                         vscode.TreeItemCollapsibleState.None,
                         {
                             command: 'rootly.goToError',
@@ -211,8 +211,9 @@ export class IncidentsTreeProvider implements vscode.TreeDataProvider<IncidentTr
                     const match = line.match(/(?:at\s+.*?\s+)?\(?([^()]+\.(ts|js|tsx|jsx|py|java|go|rb|php)):(\d+)(?::(\d+))?\)?/);
                     if (match) {
                         // Extract just the filename (not full path) for cleaner display
+                        // Extract just the filename (not full path) for cleaner display
                         const fullPath = match[1];
-                        const fileName = fullPath.split('/').pop() || fullPath.split('\\').pop() || fullPath;
+                        const fileName = fullPath.split(/[/\\]/).pop() || fullPath;
                         fileLocationText = `${fileName}:${match[3]}`;
                         break;
                     }
