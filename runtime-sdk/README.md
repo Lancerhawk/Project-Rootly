@@ -325,6 +325,24 @@ await flush(2000); // Wait up to 2 seconds
 
 The SDK automatically rate limits to 20 errors per 60 seconds. If you're hitting this limit, you may have a critical bug causing error loops.
 
+## Development
+
+### Building from Source
+
+To build the SDK from source, you need to configure the build environment:
+
+1. Create a `.env` file in the `runtime-sdk` directory:
+   ```bash
+   ROOTLY_API_URL=https://your-backend-url.com
+   ```
+
+2. Run the build script:
+   ```bash
+   npm run build
+   ```
+
+The build script will compile the TypeScript code and inject the API URL from your `.env` file into the generated JavaScript.
+
 ## License
 
 MIT
