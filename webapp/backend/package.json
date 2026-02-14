@@ -1,6 +1,6 @@
 {
   "name": "rootly-backend",
-  "version": "1.2.0",
+  "version": "1.2.3",
   "description": "Backend API for Project Rootly",
   "main": "dist/index.js",
   "scripts": {
@@ -24,7 +24,7 @@
     "express-session": "^1.18.1",
     "passport": "^0.7.0",
     "passport-github2": "^0.1.12",
-    "rootly-runtime": "^1.2.7"
+    "rootly-runtime": "^1.2.8"
   },
   "devDependencies": {
     "@types/bcrypt": "^5.0.2",

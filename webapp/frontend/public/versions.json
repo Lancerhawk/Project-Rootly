@@ -1,11 +1,33 @@
 {
-    "currentVersion": "1.2.2",
+    "currentVersion": "1.2.3",
     "versions": [
+        {
+            "version": "1.2.3",
+            "name": "SDK Security Update",
+            "releaseDate": "2026-02-14",
+            "status": "current",
+            "description": "Security hardening for Rootly SDK with externalized API configuration",
+            "features": [
+                {
+                    "title": "SDK v1.2.8 - Externalized Configuration",
+                    "description": "Moved API URL configuration to build-time environment injection to prevent source code leaks",
+                    "status": "completed"
+                }
+            ],
+            "technicalDetails": {
+                "sdk": [
+                    "Externalized API URL via .env",
+                    "Custom build script for variable injection",
+                    "Zero-config usage preserved",
+                    "Published to npm as rootly-runtime@1.2.8"
+                ]
+            }
+        },
         {
             "version": "1.2.2",
             "name": "SDK and IDE Extension Fixes",
             "releaseDate": "2026-02-10",
-            "status": "current",
+            "status": "implemented",
             "description": "Critical fixes for Express error handling, commit SHA validation, and IDE extension file path resolution",
             "features": [
                 {

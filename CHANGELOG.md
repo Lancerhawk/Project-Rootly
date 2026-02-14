@@ -8,6 +8,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ---
 
 
+## [1.2.3] - 2026-02-14
+
+### 🔒 SDK Security Update
+
+#### rootly-runtime v1.2.8
+- **Externalized API Configuration**: API URL is now injected at build time via `.env`
+- **Security**: Source code no longer contains hardcoded backend URLs
+- **Zero-Config**: Generated package works out-of-the-box with default URL
+- **Build System**: Added custom build script for environment injection
+- Published to npm
+
+---
+
 ## [1.2.2] - 2026-02-10
 
 ### SDK Updates

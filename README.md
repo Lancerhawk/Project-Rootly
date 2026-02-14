@@ -36,8 +36,9 @@ Rootly provides:
 
 ## Key Features
 
-### Current (v1.2.2 - SDK and IDE Extension Fixes)
+### Current (v1.2.3 - SDK Security Update)
 
+- SDK v1.2.8 - Externalized API configuration for improved security
 - SDK v1.2.6 - Fixed Express middleware to properly detect 5xx errors
 - SDK v1.2.5 - Added commit SHA fallback for local development
 - IDE Extension v1.1.2 - Fixed file path resolution for Windows absolute paths
@@ -91,10 +92,6 @@ Rootly provides:
 - Premium UI - Modern, responsive dark-themed interface
 
 ### Coming Soon
-
-- **Node.js SDK** (v0.2.0) - Error tracking library for Node.js apps
-- **Error Dashboard** (v0.4.0) - Real-time monitoring and analytics
-- **Team Collaboration** - Share and assign errors to team members
 - **Source Maps** - Accurate stack traces for production code
 
 ## Architecture
@@ -561,7 +558,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 Built with modern web technologies and a passion for improving developer experience.
 
-**Current Version**: 1.1.0 - IDE Extension Release
+**Current Version**: 1.2.3 - SDK Security Update
 
 ---
 

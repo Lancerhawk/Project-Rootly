@@ -2,6 +2,13 @@
 
 All notable changes to the Rootly web application are documented in this file.
 
+## [1.2.3] - 2026-02-14
+
+### SDK Updates
+- Published rootly-runtime v1.2.8 with externalized API configuration
+- Security hardening to prevent source code leaks
+- Build time environment injection via .env
+
 ## [1.2.2] - 2026-02-10
 
 ### SDK Updates
