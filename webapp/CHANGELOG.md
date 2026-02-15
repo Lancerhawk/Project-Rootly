@@ -2,12 +2,18 @@
 
 All notable changes to the Rootly web application are documented in this file.
 
+## [1.2.5] - 2026-02-15
+### IDE Extension (v1.1.4)
+- **Multi-File Stack Traces**: Added support for parsing and navigating all file locations in a stack trace, not just the first one.
+- **Improved UI**: Cleaned up file path display in incident lists and details view to show `filename:line` format.
+- **Platform Support**: Fixed path parsing for Windows file paths in stack traces.
+
 ## [1.2.4] - 2026-02-15
 
 ### IDE Extension Updates
 - **Path Resolution Fix**: "Go to Error Location" now supports absolute paths from local environments.
 - **Fuzzy Matching**: Enhanced workspace file search to locate files even when inside `node_modules` if inferred from the path.
-- **Unified Navigation**: Consistent file opening logic across all IDE extension entry points.
+- **Unified Navigation**: Clicking an incident in the sidebar or command palette now uses the same consistent logic to locate files.
 
 ## [1.2.3] - 2026-02-14
 

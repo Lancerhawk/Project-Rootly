@@ -1,11 +1,43 @@
 {
-    "currentVersion": "1.2.4",
+    "currentVersion": "1.2.5",
     "versions": [
+        {
+            "version": "1.2.5",
+            "name": "IDE Multi-File Stack Traces",
+            "releaseDate": "2026-02-15",
+            "status": "current",
+            "description": "Enhanced the IDE extension (v1.1.4) to parse and display all file locations in stack traces, allowing developers to trace the full chain of failure across multiple files.",
+            "features": [
+                {
+                    "title": "IDE Extension v1.1.4 - Multi-File Stack Traces",
+                    "description": "Incident details view now extracts and lists all file locations from stack traces, enabling navigation through the entire call stack",
+                    "status": "completed"
+                },
+                {
+                    "title": "Stack Frames List",
+                    "description": "New UI component displaying a list of clickable stack frames with cleaner 'filename:line' formatting",
+                    "status": "completed"
+                },
+                {
+                    "title": "Windows Path Support",
+                    "description": "Improved regex parsing to correctly handle Windows file paths with backslashes in stack traces",
+                    "status": "completed"
+                }
+            ],
+            "technicalDetails": {
+                "ideExtension": [
+                    "Updated stack trace parser regex to capture global matches",
+                    "Replaced single 'Go to Error' button with dynamic list of stack frames",
+                    "UI updates in webview HTML/CSS for frame list",
+                    "Published to VS Code Marketplace as v1.1.4"
+                ]
+            }
+        },
         {
             "version": "1.2.4",
             "name": "IDE Path Resolution Fix",
             "releaseDate": "2026-02-15",
-            "status": "current",
+            "status": "implemented",
             "description": "Critical fix for IDE extension 'Go to Error Location' ensuring it works with absolute paths and fuzzy matches in any workspace structure",
             "features": [
                 {
@@ -27,7 +59,7 @@
             "version": "1.2.3",
             "name": "SDK Security Update",
             "releaseDate": "2026-02-14",
-            "status": "current",
+            "status": "implemented",
             "description": "Security hardening for Rootly SDK with externalized API configuration",
             "features": [
                 {

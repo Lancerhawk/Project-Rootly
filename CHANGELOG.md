@@ -8,6 +8,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ---
 
 
+## [1.2.5] - 2026-02-15
+### IDE Extension (v1.1.4)
+- **Multi-File Stack Traces**: Added support for parsing and navigating all file locations in a stack trace, allowing developers to trace the full chain of failure.
+- **Improved UI**: Cleaned up file path display in incident lists and details view to show `filename:line` format.
+- **Platform Support**: Fixed path parsing for Windows file paths in stack traces.
+
 ## [1.2.4] - 2026-02-15
 
 ### 🐛 IDE Extension Fixes
@@ -228,7 +234,9 @@ This patch release addresses critical production deployment issues discovered du
 #### Security Improvements
 - **Token Exposure**: Removed `githubAccessToken` from `/api/me` response to prevent sensitive data leakage
 - **Debug Logging**: Added comprehensive request logging middleware for production debugging
-- **Protocol Verification**: Added logging for `req.secure`, `X-Forwarded-Proto`, and session state
+- **Integrated Documentation**: Added comprehensive documentation site for the project.
+
+
 
 ### Technical Details
 

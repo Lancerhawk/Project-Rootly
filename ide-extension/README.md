@@ -11,7 +11,8 @@ Production incidents are displayed in the VS Code sidebar with automatic polling
 The extension parses stack traces to extract file paths and line numbers, providing one-click navigation to error locations. Supported languages include TypeScript, JavaScript, Python, Java, Go, Ruby, and PHP. Files must exist in the local workspace for navigation to function.
 
 ### Incident Details
-Incidents can be expanded to view detailed information including environment context, occurrence timestamps, and commit SHA references for correlation with version control history.
+### Incident Details
+Incidents can be expanded to view detailed information including environment context, occurrence timestamps, and commit SHA. **Stack traces are fully parsed**, allowing you to see the entire chain of failure with clickable links to every file location involved.
 
 ### Manual Refresh
 A rate-limited refresh control is available in the sidebar toolbar, restricted to 5 requests per 2-minute window to prevent excessive API usage.

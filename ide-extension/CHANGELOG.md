@@ -6,6 +6,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 
+## [1.1.4] - 2026-02-15
+### Added
+- **Multi-File Stack Traces**: The incident details view now displays all file locations found in the stack trace as a clickable list, allowing navigation through the entire chain of failure.
+- **Improved Path Display**: Incident list and details now show cleaner `filename:line` format instead of full absolute paths.
+- **Windows Path Support**: Fixed path parsing to correctly handle Windows backslashes in stack traces.
+
 ## [1.1.3] - 2026-02-15
 
 ### Fixed
